@@ -1,3 +1,144 @@
 <resources>
-    <string name="app_name">CafeBrown</string>
+    <string name="app_names">CaféBrown</string>
+    <string name="app_name">کافه براون</string>
+    <string name="send">ارسال</string>
+    <string name="mobile_pre_number">+98</string>
+    <string name="mobile_hint">9123456789</string>
+    <string name="verify_hint">123456</string>
+    <string name="login">ورود</string>
+    <string name="receive_again_code">دریافت مجدد کد</string>
+    <string name="menu">منو</string>
+    <string name="desk_reserve_and_order">رزرو میز و سفارش</string>
+    <string name="reserve_history">سابقه رزرو</string>
+    <string name="transaction">تراکنش مالی</string>
+    <string name="profile">اطلاعات کاربری</string>
+    <string name="about_us">ارتباط با ما</string>
+    <string name="person">نفر</string>
+    <string name="empty">خالی</string>
+    <string name="full">پر</string>
+    <string name="desk_reserve">رزرو میز</string>
+    <string name="first_name">نام</string>
+    <string name="last_name">نام خانوادگی</string>
+    <string name="mobile_number">شماره موبایل</string>
+    <string name="gender">جنسیت</string>
+    <string name="birth_date">تاریخ تولد</string>
+    <string name="male">مرد</string>
+    <string name="female">زن</string>
+    <string name="edit">ویرایش</string>
+    <string name="reserve">رزرو</string>
+    <string name="order">سفارش</string>
+    <string name="see_the_reserves">مشاهده رزروها</string>
+    <string name="successfully">موفق</string>
+    <string name="failed">ناموفق</string>
+    <string name="toman">تومان</string>
+    <string name="submit_order">ثبت سفارش</string>
+    <string name="design_and_developed">طراحی و توسعه</string>
+    <string name="company_name">شرکت آتیه سازان رایاافزار تارا</string>
+    <string name="company_phone">045 - 33517081</string>
+    <string name="company_website">www.aratsoft.ir</string>
+    <string name="sign_up">ثبت نام</string>
+    <string name="submit">ثبت</string>
+    <string name="send_comment_and_rate">ثبت نظر</string>
+    <string name="products">محصولات</string>
+    <string name="try_again">تلاش مجدد</string>
+    <string name="reserve_orders">محصولات رزرو</string>
+    <string name="online_payment">پرداخت آنلاین</string>
+    <string name="wallet_payment">کیف پول</string>
+    <string name="balance_is_not_enough">اعتبار ناکافی</string>
+    <string name="amount_hint">100,000</string>
+    <string name="from_hour">از ساعت</string>
+    <string name="after">بعد</string>
+    <string name="until">تا</string>
+    <string name="extended_mode">(تمدید شده)</string>
+    <string name="connection_and_support">ارتباط و پشتیبانی</string>
+    <string name="about_cafe">درباره کافه براون</string>
+    <string name="terms_of_services">قوانین و مقررات</string>
+    <string name="all">تمام</string>
+    <string name="submit_a_complaint">ثبت شکایت</string>
+    <string name="see_app_rules">مشاهده قوانین و مقررات برنامه</string>
+
+    <string name="capacity_of_desk_is">ظرفیت میز :</string>
+    <string name="status_at_the_moment_is">وضعیت فعلی :</string>
+    <string name="your_balance_is">موجودی شما :</string>
+    <string name="see_commend">مشاهده نظرات</string>
+    <string name="instructions">طرز تهیه :</string>
+    <string name="sent_comment_and_rate">ارسال نظر و انتقاد :</string>
+    <string name="detail_of_product">اطلاعات محصول :</string>
+    <string name="the_amount_payable">مبلغ قابل پرداخت :</string>
+    <string name="tbl_amount">مبلغ رزرو میز :</string>
+    <string name="reserve_amount">مبلغ سفارشات :</string>
+    <string name="selected_reserve_date">تاریخ انتخاب شده برای رزرو :</string>
+    <string name="selected_reserve_time">ساعت و مدت انتخاب شده برای رزرو :</string>
+    <string name="your_wallet_balance_is">موجودی کیف پول شما :</string>
+    <string name="youre_reserve">رزرو شما</string>
+    <string name="count_is">تعداد :</string>
+    <string name="per_order_amount_is">قیمت واحد :</string>
+    <string name="total_amount_is">مجموع قیمت :</string>
+    <string name="wifi_pass">رمز وای فای :</string>
+    <string name="desk_title">عنوان میز :</string>
+
+    <string name="empty_view">در حال حاضر موردی برای نمایش وجود ندارد.</string>
+    <string name="please_enter_your_mobile_number">لطفا برای ورود شماره موبایل خود را وارد کنید </string>
+    <string name="the_code_that_sent_to_mobile_number">کد ارسال شده به شماره موبایل</string>
+    <string name="enter_that">را وارد کنید .</string>
+    <string name="empty_mobile_number">لطفا شماره موبایل خود را وارد نمایید</string>
+    <string name="empty_verify_code">لطفا کد تایید خود را وارد نمایید</string>
+    <string name="invalid_mobile_number">لطفا شماره موبایل خود را بررسی نمایید</string>
+    <string name="invalid_verify_code">لطفا کد تایید خود را بررسی نمایید</string>
+    <string name="please_select_your_reserve_date">لطفا تاریخ رزرو خود را انتخاب کنید </string>
+    <string name="please_select_your_reserve_time_and_duration">لطفا ساعت و مدت رزرو خود را انتخاب کنید </string>
+    <string name="selected_date_is_ready_for_reserve">تاریخ انتخاب شده برای رزرو آماده است </string>
+    <string name="coffee_address">اردبیل ، خیابان والی ، نرسیده به درمانگاه ولیعصر ، کافه براون</string>
+    <string name="if_you_follow_quality">اگه به دنبال برنامه نویسی با کیفیت هستید،</string>
+    <string name="we_are_ready_for_this">ما برای انجام این کار آماده ایم،</string>
+    <string name="because_of_make_that_is_for_us">چرا که خلق این آثار تخصص ماست .</string>
+    <string name="please_enter_your_comment">لطفا نظر، انتقاد و پشنهاد خود را تایپ کنید ...</string>
+    <string name="internet_connection_problem">لطفا اتصال اینترنت خود را بازبینی فرمایید</string>
+    <string name="connection_problem">خطا در برقراری ارتباط لطفا دوباره تلاش کنید</string>
+    <string name="empty_first_name">لطفا نام خود را وارد نمایید</string>
+    <string name="empty_last_name">لطفا نام خانوادگی خود را وارد نمایید</string>
+    <string name="successfully_profile_updated">اطلاعات کاربری با موفقیت ویرایش گردید</string>
+    <string name="successfully_comment_posted">نظر شما با موفقیت ثبت گردید</string>
+    <string name="empty_comment">لطفا نظر خود را وارد نمایید</string>
+    <string name="there_is_not_comment_for_this_product">برای این محصول هیچ نظری ثبت نشده است</string>
+    <string name="check_table_status">بررسی وضعیت میز</string>
+    <string name="reserve_successfully">رزرو با موفقیت انجام شد</string>
+    <string name="problem_in_opening_this_link">متاسفانه در بارگزاری این صفحه مشکلی پیش آمده است</string>
+    <string name="there_is_not_reserve_for_this_table">برای این میز هیچ رزروی ثبت نشده است</string>
+    <string name="brown_coffee_shop_payment">پرداخت هزینه ی سفارش یا رزرو میز کافی براون</string>
+    <string name="payment_request_problem">متاسفانه در ایجاد درخواست پرداخت خطایی رخ داده است</string>
+    <string name="payment_problem">متاسفانه پرداخت با موفقیت انجام نشد.</string>
+    <string name="please_select_payment_type">لطفا نحوه ی پرداخت را انتخاب نمایید.</string>
+    <string name="there_is_not_any_order_for_this_reserve">هیچ محصولی برای این رزرو انتخاب نشده است</string>
+    <string name="please_enter_increase_amount">لطفا مبلغ خود را جهت افزایش موجودی وارد نمایید :</string>
+    <string name="amount_of_increase_balance_error">مبلغ وارد شده باید بیشتر از 100 تومان باشد</string>
+    <string name="increase_balance_successfully">شارژ کیف پول با موفقیت انجام شد .</string>
+    <string name="image_not_exist">تصویری برای مشاهده وجود ندارد .</string>
+    <string name="for_support_you_can_use_this_links">برای ارتباط با بخش پشتیبانی شما میتوانید از گزینه ی تماس تلفنی زیر استفاده نمایید لازم به ذکر است که بخش پشتیبانی ما همه روزه باستثنای روز های تعطیل از ساعت 10 الی 20 آماده پاسخگویی به مشتریان عزیز می باشد.</string>
+    <string name="i_accept_this_app">این برنامه را میپذیرم.</string>
+    <string name="please_read_and_accept_rules">لطفا ابتدا قوانین و مقررات را خوانده و بپذیرید.</string>
+    <string name="please_enter_your_complaint">لطفا متن شکایت خود را تایپ کنید ...</string>
+    <string name="please_send_us_complaint">اگر از ما شکایت دارید ، برایمان ارسال کنید</string>
+    <string name="empty_complaint">متن شکایت نمی تواند خالی باشد</string>
+    <string name="post_complaint_successfully">شکایت شما با موفقیت ارسال گردید</string>
+    <string name="app_rules">قوانین استفاده از خدمات نرم افزار کافه براون
+    \n
+        \n
+        کافه براون تابع قوانین و مقررات جمهوری اسلامی ایران است و درج هرگونه موارد سیاسی، غیر اخلاقی و مغایر با هنجارهای اجتماعی باعث حذف حساب کاربر مورد نظر خواهد شد.
+    \n
+    \n
+        استفاده از نام و نام‌خانوادگی حقیقی افراد به منظور ثبت نام در برنامه الزامی است. در صورت مشاهده کلمات رکیک و الفاظ نامناسب، حساب كاربر حذف خواهد شد.
+    \n
+    \n
+        هنگام رزرو، ثبت یک شماره معتبر و قابل دسترس برای کاربران الزامی است.
+    \n
+    \n
+    مسئولیت وارد کردن اطلاعات اشتباه و غیر واقعی از قبیل نام و نام خانوادگی، آدرس و شماره تماس به عهده کاربر است.
+    \n
+    \n
+    تمامی متن‌ها، طرح‌های گرافیکی و کدهای به کار گرفته شده در نرم افزار کافه براون جزو اموال شرکت «آتیه سازان رایاافزار تارا» محسوب شده و هرگونه کپی برداری، نشر، نمایش، بازسازی و انتقال آن به هر صورت بدون اجازه مالک ممنوع بوده و پیگرد قانونی در پی خواهد داشت.</string>
+
+    <string name="lorem_ipsum">لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد. کتابهای زیادی در شصت و سه درصد گذشته، حال و آینده شناخت فراوان جامعه و متخصصان را می طلبد</string>
+    <string name="enter_the_sent_code">کد ارسال شده به شماره موبایل %1$s را وارد نمایید .</string>
+
 </resources>
