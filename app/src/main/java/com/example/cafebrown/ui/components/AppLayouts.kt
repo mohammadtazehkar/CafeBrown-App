@@ -130,3 +130,83 @@ fun MainBox(
     }
 
 }
+
+@Composable
+fun CardMediumCorner(
+    modifier : Modifier = Modifier,
+    content: @Composable () -> Unit
+){
+    Card(
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
+        modifier = modifier
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun CardColumnMediumCorner(
+    modifier : Modifier = Modifier,
+    cardModifier : Modifier = Modifier,
+    columnModifier : Modifier = Modifier,
+    columnHorizontalAlignment : Alignment.Horizontal = Alignment.CenterHorizontally ,
+    content: @Composable () -> Unit
+) {
+    CardMediumCorner (
+        modifier = cardModifier
+    ){
+        Column(
+            modifier = columnModifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),
+            horizontalAlignment = columnHorizontalAlignment
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun CardBoxMediumCorner(
+    modifier : Modifier = Modifier,
+    cardModifier : Modifier = Modifier,
+    boxModifier : Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit
+){
+    CardMediumCorner (
+        modifier = cardModifier
+    ){
+        Box(
+            modifier = boxModifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp))
+        {
+            content()
+        }
+    }
+}
+
+
+
+@Composable
+fun CardRowMediumCorner(
+    modifier : Modifier = Modifier,
+    cardModifier : Modifier = Modifier,
+    rowModifier : Modifier = Modifier,
+    rowVerticalAlignment : Alignment.Vertical = Alignment.CenterVertically ,
+    content: @Composable RowScope.() -> Unit
+) {
+    CardMediumCorner (
+        modifier = cardModifier
+    ){
+        Row(
+            modifier = rowModifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp),
+            verticalAlignment = rowVerticalAlignment
+        ) {
+            content()
+        }
+    }
+}

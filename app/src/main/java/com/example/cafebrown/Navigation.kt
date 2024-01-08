@@ -13,6 +13,7 @@ import com.example.cafebrown.ui.screens.*
 import com.example.cafebrown.utils.ArgumentKeys.MOBILE_NUMBER
 import com.example.cafebrown.utils.Destinations.HOME_SCREEN
 import com.example.cafebrown.utils.Destinations.LOGIN_SCREEN
+import com.example.cafebrown.utils.Destinations.PROFILE_SCREEN
 import com.example.cafebrown.utils.Destinations.SPLASH_SCREEN
 import com.example.cafebrown.utils.Destinations.VERIFY_SCREEN
 
@@ -23,8 +24,8 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = SPLASH_SCREEN,
-//        startDestination = MAP_SCREEN,
+//        startDestination = SPLASH_SCREEN,
+        startDestination = PROFILE_SCREEN,
     ) {
 
         composable(
@@ -139,23 +140,15 @@ fun AppNavHost(
         ) {
             VerifyScreen(
                 onNavigateToProfile = {
-                    navController.navigate(HOME_SCREEN) {
-                        popUpTo(SPLASH_SCREEN) {
+                    navController.navigate(PROFILE_SCREEN) {
+                        popUpTo(LOGIN_SCREEN) {
+                            inclusive = true
+                        }
+                        popUpTo(VERIFY_SCREEN) {
                             inclusive = true
                         }
                     }
                 }
-//                onSignUpSubmitted = {
-//                    navController.navigate(HOME_SCREEN){
-//                        popUpTo(SIGN_UP_SCREEN) {
-//                            inclusive = true
-//                        }
-//                        popUpTo(SIGN_IN_SCREEN) {
-//                            inclusive = true
-//                        }
-//                    }
-//                },
-//                onNavUp = navController::navigateUp,
             )
         }
         composable(
@@ -203,47 +196,52 @@ fun AppNavHost(
 //                }
             )
         }
-//        composable(
-//            route = PROFILE_SCREEN,
-//            enterTransition = {
-//                slideIntoContainer(
-//                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-//                    animationSpec = tween(500)
-//                )
-//            },
-//            exitTransition = {
-//                slideOutOfContainer(
-//                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-//                    animationSpec = tween(500)
-//                )
-//            },
-//            popEnterTransition = {
-//                slideIntoContainer(
-//                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
-//                    animationSpec = tween(500)
-//                )
-//            },
-//            popExitTransition = {
-//                slideOutOfContainer(
-//                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
-//                    animationSpec = tween(500)
-//                )
-//            }
-//        ) {
-//            ProfileScreen(
-//                onExpiredToken = {
+        composable(
+            route = PROFILE_SCREEN,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+            ProfileScreen(
+//                onNavigateToAddService = { catId,catTitle ->
+//                    navController.navigate("$ADD_SERVICE_SCREEN/$catId/$catTitle")
+//                },
+//                onDrawerItemClick = { navigateTo ->
+//                    if (navigateTo.isNotEmpty()) {
+//                        navController.navigate(navigateTo)
+//                    }
+//                },
+//                onLogoutCompleted = {
 //                    navController.navigate(SPLASH_SCREEN){
-//                        popUpTo(PROFILE_SCREEN) {
-//                            inclusive = true
-//                        }
 //                        popUpTo(HOME_SCREEN) {
 //                            inclusive = true
 //                        }
 //                    }
-//                },
-//                onNavUp = navController::navigateUp
-//            )
-//        }
+//                }
+            )
+        }
+
 //        composable(
 //            route = MY_SERVICES_SCREEN,
 //            enterTransition = {

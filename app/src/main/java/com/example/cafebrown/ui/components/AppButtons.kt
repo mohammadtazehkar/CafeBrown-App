@@ -1,5 +1,6 @@
 package com.example.cafebrown.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,9 +15,83 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.cafebrown.utils.ClickHelper
 
+
+@Composable
+fun PrimaryButton(
+    text: String,
+    onClick: () -> Unit
+){
+    Button(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        onClick = { ClickHelper.getInstance().clickOnce { onClick() }},
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+        shape = MaterialTheme.shapes.small
+    ) {
+        TextTitleSmallOnPrimary(
+            modifier = Modifier.padding(vertical = 8.dp),
+            text = text,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+fun PrimaryButton(
+    modifier: Modifier,
+    text: String,
+    onClick: () -> Unit
+){
+    Button(
+        modifier = modifier.padding(16.dp),
+        onClick = { ClickHelper.getInstance().clickOnce { onClick() }},
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+        shape = MaterialTheme.shapes.small
+    ) {
+        TextTitleSmallOnPrimary(
+            modifier = Modifier.padding(vertical = 8.dp),
+            text = text,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+fun PrimaryButton(
+    modifier: Modifier,
+    firstText: String,
+    secondText: String,
+    status: Boolean,
+    onClick: () -> Unit
+){
+    Button(
+        modifier = modifier
+            .padding(16.dp),
+        onClick = { ClickHelper.getInstance().clickOnce { onClick() }},
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+        shape = MaterialTheme.shapes.small
+    ) {
+        if (status) {
+            TextTitleSmallOnPrimary(
+                modifier = Modifier.padding(vertical = 8.dp),
+                text = firstText,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        else{
+            TextTitleSmallOnPrimary(
+                modifier = Modifier.padding(vertical = 8.dp),
+                text = secondText,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
 @Composable
 fun SecondaryButton(
-    stringId: Int,
+    text: String,
     onClick: () -> Unit
 ){
     Button(
@@ -29,7 +104,7 @@ fun SecondaryButton(
     ) {
         TextTitleSmallOnSecondary(
             modifier = Modifier.padding(vertical = 8.dp),
-            text = stringResource(id = stringId),
+            text = text,
             fontWeight = FontWeight.Bold
         )
     }
@@ -38,7 +113,7 @@ fun SecondaryButton(
 @Composable
 fun SecondaryButton(
     modifier: Modifier,
-    stringId: Int,
+    text: String,
     onClick: () -> Unit
 ){
     Button(
@@ -49,25 +124,58 @@ fun SecondaryButton(
     ) {
         TextTitleSmallOnSecondary(
             modifier = Modifier.padding(vertical = 8.dp),
-            text = stringResource(id = stringId),
+            text = text,
             fontWeight = FontWeight.Bold
         )
     }
 }
 
 @Composable
+fun SecondaryButton(
+    modifier: Modifier,
+    firstText: String,
+    secondText: String,
+    status: Boolean,
+    onClick: () -> Unit
+){
+    Button(
+        modifier = modifier
+            .padding(16.dp),
+        onClick = { ClickHelper.getInstance().clickOnce { onClick() }},
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+        shape = MaterialTheme.shapes.small
+    ) {
+        if (status) {
+            TextTitleSmallOnSecondary(
+                modifier = Modifier.padding(vertical = 8.dp),
+                text = firstText,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        else{
+            TextTitleSmallOnSecondary(
+                modifier = Modifier.padding(vertical = 8.dp),
+                text = secondText,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
 fun PrimaryButtonExtraSmallCorner(
     modifier: Modifier = Modifier,
-    stringId: Int,
+    text: String,
     onClick: () -> Unit
 ){
     Button(
         onClick = { ClickHelper.getInstance().clickOnce { onClick() }},
         modifier = modifier,
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
         shape = MaterialTheme.shapes.extraSmall
     ) {
         TextTitleSmallOnPrimary(
-            text = stringResource(id = stringId),
+            text = text,
             modifier = Modifier.padding(vertical = 4.dp),
             fontWeight = FontWeight.Bold
         )
@@ -77,7 +185,7 @@ fun PrimaryButtonExtraSmallCorner(
 @Composable
 fun PrimaryOutlinedButtonExtraSmallCorner(
     modifier: Modifier = Modifier,
-    stringId: Int,
+    text: String,
     onClick: () -> Unit
 ){
     OutlinedButton(
@@ -87,7 +195,7 @@ fun PrimaryOutlinedButtonExtraSmallCorner(
         shape = MaterialTheme.shapes.extraSmall,
     ) {
         TextTitleSmallPrimary(
-            text = stringResource(id = stringId),
+            text = text,
             modifier = Modifier.padding(vertical = 4.dp),
             fontWeight = FontWeight.Bold
         )

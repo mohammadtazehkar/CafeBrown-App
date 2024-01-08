@@ -64,7 +64,7 @@ class LoginViewModel : ViewModel() {
     private fun login(
         onLoginCompleted: (String) -> Unit
     ) {
-        if (_loginState.value.mobileNumber.isEmpty()) {
+        if (loginState.value.mobileNumber.isEmpty()) {
             viewModelScope.launch {
                 _uiEventFlow.emit(
                     AppUIEvent.ShowMessage(
@@ -76,7 +76,7 @@ class LoginViewModel : ViewModel() {
                 )
             }
         }
-        else if (_loginState.value.mobileNumber.length != 10) {
+        else if (loginState.value.mobileNumber.length != 10) {
             viewModelScope.launch {
                 _uiEventFlow.emit(
                     AppUIEvent.ShowMessage(
@@ -88,7 +88,7 @@ class LoginViewModel : ViewModel() {
                 )
             }
         }
-        else if (_loginState.value.mobileNumber.substring(0,1) != "9") {
+        else if (loginState.value.mobileNumber.substring(0,1) != "9") {
             viewModelScope.launch {
                 _uiEventFlow.emit(
                     AppUIEvent.ShowMessage(
@@ -118,7 +118,7 @@ class LoginViewModel : ViewModel() {
 //                        )
 //                    )
 //                }else if (_signInState.value.response.data?.statusCode == SUCCESS){
-                    onLoginCompleted("+98${loginState.value.mobileNumber}")
+                    onLoginCompleted("0${loginState.value.mobileNumber}")
 //                }
         }
     }

@@ -10,6 +10,7 @@ object Destinations{
     const val SPLASH_SCREEN = "splash"
     const val LOGIN_SCREEN = "login"
     const val VERIFY_SCREEN = "verify"
+    const val PROFILE_SCREEN = "profile"
     const val HOME_SCREEN = "home"
 }
 //endregion

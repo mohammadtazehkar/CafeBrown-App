@@ -15,6 +15,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cafebrown.R
 import com.example.cafebrown.ui.components.MainColumn
+import com.example.cafebrown.ui.components.TextHeadlineLarge
 import com.example.cafebrown.ui.components.TextHeadlineLargeOnSecondary
 import kotlinx.coroutines.delay
 
@@ -44,7 +45,7 @@ fun SplashScreen(
                 iterations = LottieConstants.IterateForever,
             )
 
-            TextHeadlineLargeOnSecondary(text = stringResource(id = R.string.app_name), modifier = Modifier.padding(32.dp).align(
+            TextHeadlineLarge(text = stringResource(id = R.string.app_name), modifier = Modifier.padding(32.dp).align(
                 Alignment.BottomCenter))
 
         }

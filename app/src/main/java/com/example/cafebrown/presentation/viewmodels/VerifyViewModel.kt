@@ -1,5 +1,6 @@
 package com.example.cafebrown.presentation.viewmodels
 
+import android.text.format.DateUtils
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -23,7 +24,7 @@ class VerifyViewModel(
 ) : ViewModel() {
     private val _verifyState = mutableStateOf(
         VerifyState(
-            mobileNumber = savedStateHandle.get<String>(MOBILE_NUMBER)!!
+            mobileNumber = savedStateHandle.get<String>(MOBILE_NUMBER)!!,
 //            response = Resource.Error("")
         )
     )
@@ -31,6 +32,10 @@ class VerifyViewModel(
 
     private val _uiEventFlow = MutableSharedFlow<AppUIEvent>()
     val uiEventFlow = _uiEventFlow.asSharedFlow()
+
+    init {
+        startTimer()
+    }
 
     fun onEvent(event: VerifyEvent) {
         when (event) {
@@ -40,72 +45,138 @@ class VerifyViewModel(
                     keyboardState = AppKeyboard.Opened
                 )
             }
+
             is VerifyEvent.KeyboardClose -> {
                 _verifyState.value = verifyState.value.copy(
                     keyboardState = AppKeyboard.Closed
                 )
             }
+
             is VerifyEvent.UpdateVerifyCodeState -> {
                 _verifyState.value = verifyState.value.copy(
-                    verifyCode = event.newValue
+                    verifyCode = event.newValue,
+                )
+                if (verifyState.value.verifyCode.length == 6){
+                    updateActionLabel(event.label)
+                }
+                _verifyState.value = verifyState.value.copy(
+                    isTimerVisible = verifyState.value.verifyCode.length != 6
                 )
             }
+
             is VerifyEvent.MakeVerifyCodeEmpty -> {
                 _verifyState.value = verifyState.value.copy(
-                    verifyCode = ""
+                    verifyCode = "",
+                    isTimerVisible = true
                 )
             }
+
             is VerifyEvent.VerifyClicked -> {
                 verify(onVerificationCompleted = event.onNavigateToProfile)
             }
+
             is VerifyEvent.UpdateLoading -> {
                 _verifyState.value = verifyState.value.copy(
                     isLoading = event.status
                 )
             }
+
+            is VerifyEvent.AcceptRules -> {
+                _verifyState.value = verifyState.value.copy(
+                    isRulesAccepted = true
+                )
+            }
+
+            is VerifyEvent.UpdateRulesDialogVisibility -> {
+                _verifyState.value = verifyState.value.copy(
+                    isRulesDialogVisible = event.status
+                )
+            }
+
+            is VerifyEvent.UpdateTimeLeft -> {
+                    val duration = DateUtils.formatElapsedTime(verifyState.value.timeLeft / 1000)
+                    _verifyState.value = verifyState.value.copy(
+                        timeLeft = verifyState.value.timeLeft - 1000,
+                        timer = duration
+                    )
+            }
+
+            is VerifyEvent.UpdateResendCodeState -> {
+                _verifyState.value = verifyState.value.copy(
+                    verifyCode = "",
+                    isResendCodeState = event.status,
+                    isTimerVisible = false
+                )
+            }
+
+            is VerifyEvent.UpdateActionLabel -> {
+                updateActionLabel(event.text)
+            }
         }
+    }
+
+    private fun updateActionLabel(text: String){
+        _verifyState.value = verifyState.value.copy(
+            actionLabel = text,
+        )
+    }
+    private fun startTimer(){
+        val duration = DateUtils.formatElapsedTime(verifyState.value.timeLeft / 1000)
+        _verifyState.value = verifyState.value.copy(
+            timeLeft = 90 * 1000,
+            timer = duration
+        )
     }
 
     private fun verify(
         onVerificationCompleted: () -> Unit
     ) {
-        if (_verifyState.value.verifyCode.isEmpty()) {
-            viewModelScope.launch {
-                _uiEventFlow.emit(
-                    AppUIEvent.ShowMessage(
-                        message = UIText.StringResource(
-                            resId = R.string.empty_verify_code,
-                            _verifyState.value.verifyCode
+        if (verifyState.value.isResendCodeState){
+            startTimer()
+            _verifyState.value = verifyState.value.copy(
+                verifyCode = "",
+                isResendCodeState = false,
+                isTimerVisible = true
+            )
+        }
+        else{
+            if (verifyState.value.verifyCode.isEmpty()) {
+                viewModelScope.launch {
+                    _uiEventFlow.emit(
+                        AppUIEvent.ShowMessage(
+                            message = UIText.StringResource(
+                                resId = R.string.empty_verify_code,
+                                _verifyState.value.verifyCode
+                            )
                         )
                     )
-                )
+                }
             }
-        }
-        else if (_verifyState.value.verifyCode.length != 6) {
-            viewModelScope.launch {
-                _uiEventFlow.emit(
-                    AppUIEvent.ShowMessage(
-                        message = UIText.StringResource(
-                            resId = R.string.invalid_verify_code,
-                            _verifyState.value.verifyCode
+            else if (verifyState.value.verifyCode.length != 6) {
+                viewModelScope.launch {
+                    _uiEventFlow.emit(
+                        AppUIEvent.ShowMessage(
+                            message = UIText.StringResource(
+                                resId = R.string.invalid_verify_code,
+                                _verifyState.value.verifyCode
+                            )
                         )
                     )
-                )
+                }
             }
-        }
-        else if (_verifyState.value.mobileNumber.substring(0,1) != "9") {
-            viewModelScope.launch {
-                _uiEventFlow.emit(
-                    AppUIEvent.ShowMessage(
-                        message = UIText.StringResource(
-                            resId = R.string.invalid_mobile_number,
-                            _verifyState.value.verifyCode
+            else if (!verifyState.value.isRulesAccepted) {
+                viewModelScope.launch {
+                    _uiEventFlow.emit(
+                        AppUIEvent.ShowMessage(
+                            message = UIText.StringResource(
+                                resId = R.string.please_read_and_accept_rules,
+                                _verifyState.value.verifyCode
+                            )
                         )
                     )
-                )
+                }
             }
-        }
-        else {
+            else {
 //            _loginState.value = loginState.value.copy(
 //                response = Resource.Loading()
 //            )
@@ -123,8 +194,9 @@ class VerifyViewModel(
 //                        )
 //                    )
 //                }else if (_signInState.value.response.data?.statusCode == SUCCESS){
-                    onVerificationCompleted()
+                onVerificationCompleted()
 //                }
+            }
         }
     }
 }
