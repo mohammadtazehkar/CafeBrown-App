@@ -1,73 +1,63 @@
 package com.example.cafebrown.ui.screens
 
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.Text
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.cafebrown.ui.components.Picker
-import com.example.cafebrown.ui.components.rememberPickerState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.cafebrown.R
+import com.example.cafebrown.presentation.events.ProfileEvent
+import com.example.cafebrown.presentation.viewmodels.ProfileViewModel
+import com.example.cafebrown.ui.components.AppDatePicker
+import com.example.cafebrown.ui.components.AppTopAppBar
+import com.example.cafebrown.ui.components.MainColumn
 
 @Composable
-fun ProfileScreen(){
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
-    ) {
+fun ProfileScreen(
+    profileViewModel: ProfileViewModel = viewModel()
+){
+    val profileState = profileViewModel.profileState
 
-        val years = remember { (1300..1402).map { it.toString() } }
-        val yearsPickerState = rememberPickerState()
-        val units = remember { listOf("seconds", "minutes", "hours") }
-        val unitsPickerState = rememberPickerState()
-        val days = remember { (1..31).map { it.toString() } }
-        val daysPickerState = rememberPickerState()
-
-        Text(text = "Example Picker", modifier = Modifier.padding(top = 16.dp))
-        Row(modifier = Modifier.fillMaxWidth()) {
-            Picker(
-                state = yearsPickerState,
-                items = years,
-                visibleItemsCount = 3,
-                modifier = Modifier.weight(0.3f),
-                textModifier = Modifier.padding(8.dp),
-                textStyle = TextStyle(fontSize = 32.sp)
-            )
-            Spacer(modifier = Modifier.size(16.dp))
-            Picker(
-                state = unitsPickerState,
-                items = units,
-                visibleItemsCount = 3,
-                modifier = Modifier.weight(0.7f),
-                textModifier = Modifier.padding(8.dp),
-                textStyle = TextStyle(fontSize = 32.sp)
-            )
-            Spacer(modifier = Modifier.size(16.dp))
-            Picker(
-                state = daysPickerState,
-                items = days,
-                visibleItemsCount = 3,
-                modifier = Modifier.weight(0.3f),
-                textModifier = Modifier.padding(8.dp),
-                textStyle = TextStyle(fontSize = 32.sp)
-            )
+    Scaffold (
+        topBar = {
+                 AppTopAppBar(title = stringResource(id = R.string.profile))
+        },
+        snackbarHost = {},
+        content = {paddingValues ->
+            MainColumn(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.Top
+            ) {
+                Row (modifier = Modifier.fillMaxWidth()){
+                    AppDatePicker(
+                        yearList = profileState.value.yearsList,
+                        monthList = profileState.value.monthList,
+                        dayList = profileState.value.daysList,
+                        onSelectedYear = {selectedValue ->
+                            profileViewModel.onEvent(ProfileEvent.UpdateSelectedYear(selectedValue))
+                        },
+                        onSelectedMonth = {selectedValue ->
+                            profileViewModel.onEvent(ProfileEvent.UpdateSelectedMonth(selectedValue))
+                        },
+                        onSelectedDay = {selectedValue ->
+                            profileViewModel.onEvent(ProfileEvent.UpdateSelectedDay(selectedValue))
+                        }
+                    )
+                }
+            }
         }
-
-        Text(
-            text = "Interval: ${yearsPickerState.selectedItem} ${unitsPickerState.selectedItem} ${daysPickerState.selectedItem}" ,
-            modifier = Modifier.padding(vertical = 16.dp)
-        )
-
-    }
+    )
 }
+

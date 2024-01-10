@@ -30,6 +30,8 @@ import com.example.cafebrown.R
 @Composable
 fun MainColumn(
     modifier: Modifier = Modifier,
+    verticalArrangement : Arrangement.Vertical = Arrangement.Center,
+    horizontalAlignment : Alignment.Horizontal = Alignment.CenterHorizontally,
     content: @Composable () -> Unit
 ) {
     val image = ImageBitmap.imageResource(R.drawable.img_main_pattern)
@@ -71,9 +73,9 @@ fun MainColumn(
             modifier = patternModifier.fillMaxSize()
         ) {}
         Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = modifier.fillMaxSize(),
+            verticalArrangement = verticalArrangement,
+            horizontalAlignment = horizontalAlignment
         ) {
             content()
         }
