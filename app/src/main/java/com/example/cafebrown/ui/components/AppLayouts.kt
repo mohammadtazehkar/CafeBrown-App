@@ -125,7 +125,7 @@ fun MainBox(
             modifier = patternModifier.fillMaxSize()
         ) {}
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
         ) {
             content()
         }

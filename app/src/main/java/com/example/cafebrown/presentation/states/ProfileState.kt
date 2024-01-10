@@ -16,5 +16,7 @@ data class ProfileState(
     var selectedYear : String = "1",
     var selectedMonth : String = "1",
     var selectedDay : String = "1320",
+    var from : String = "",
+
 //    var response : Resource<APISignInResponse>
 )

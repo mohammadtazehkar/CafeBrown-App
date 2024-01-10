@@ -18,6 +18,7 @@ object Destinations{
 //region ArgumentKeys
 object ArgumentKeys{
     const val MOBILE_NUMBER = "mobileNumber"
+    const val FROM = "from"
 
 }
 //endregion

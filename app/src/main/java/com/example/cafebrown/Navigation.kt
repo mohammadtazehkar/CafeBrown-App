@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.cafebrown.ui.screens.*
+import com.example.cafebrown.utils.ArgumentKeys.FROM
 import com.example.cafebrown.utils.ArgumentKeys.MOBILE_NUMBER
 import com.example.cafebrown.utils.Destinations.HOME_SCREEN
 import com.example.cafebrown.utils.Destinations.LOGIN_SCREEN
@@ -24,8 +25,8 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-//        startDestination = SPLASH_SCREEN,
-        startDestination = PROFILE_SCREEN,
+        startDestination = SPLASH_SCREEN,
+//        startDestination = PROFILE_SCREEN,
     ) {
 
         composable(
@@ -55,7 +56,7 @@ fun AppNavHost(
                 )
             }
         ) {
-            SplashScreen (
+            SplashScreen(
                 onNavigateToLogin = {
                     navController.navigate(LOGIN_SCREEN) {
                         popUpTo(SPLASH_SCREEN) {
@@ -100,7 +101,7 @@ fun AppNavHost(
             }
         ) {
             LoginScreen(
-                onNavigateToVerify = {mobileNumber ->
+                onNavigateToVerify = { mobileNumber ->
                     navController.navigate("$VERIFY_SCREEN/$mobileNumber")
                 },
             )
@@ -108,7 +109,7 @@ fun AppNavHost(
         composable(
             route = "$VERIFY_SCREEN/{$MOBILE_NUMBER}",
             arguments = listOf(
-                navArgument(MOBILE_NUMBER){
+                navArgument(MOBILE_NUMBER) {
                     type = NavType.StringType
                     defaultValue = ""
                 }
@@ -140,11 +141,11 @@ fun AppNavHost(
         ) {
             VerifyScreen(
                 onNavigateToProfile = {
-                    navController.navigate(PROFILE_SCREEN) {
-                        popUpTo(LOGIN_SCREEN) {
+                    navController.navigate("$PROFILE_SCREEN/$VERIFY_SCREEN") {
+                        popUpTo("$VERIFY_SCREEN/{$MOBILE_NUMBER}") {
                             inclusive = true
                         }
-                        popUpTo(VERIFY_SCREEN) {
+                        popUpTo(LOGIN_SCREEN) {
                             inclusive = true
                         }
                     }
@@ -197,7 +198,13 @@ fun AppNavHost(
             )
         }
         composable(
-            route = PROFILE_SCREEN,
+            route = "$PROFILE_SCREEN/{$FROM}",
+            arguments = listOf(
+                navArgument(FROM) {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            ),
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
@@ -224,21 +231,13 @@ fun AppNavHost(
             }
         ) {
             ProfileScreen(
-//                onNavigateToAddService = { catId,catTitle ->
-//                    navController.navigate("$ADD_SERVICE_SCREEN/$catId/$catTitle")
-//                },
-//                onDrawerItemClick = { navigateTo ->
-//                    if (navigateTo.isNotEmpty()) {
-//                        navController.navigate(navigateTo)
-//                    }
-//                },
-//                onLogoutCompleted = {
-//                    navController.navigate(SPLASH_SCREEN){
-//                        popUpTo(HOME_SCREEN) {
-//                            inclusive = true
-//                        }
-//                    }
-//                }
+                onSignUpCompleted = {
+                    navController.navigate(HOME_SCREEN) {
+                        popUpTo("$PROFILE_SCREEN/{$FROM}") {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
 

@@ -10,6 +10,7 @@ import com.example.cafebrown.R
 import com.example.cafebrown.presentation.events.AppUIEvent
 import com.example.cafebrown.presentation.events.ProfileEvent
 import com.example.cafebrown.presentation.states.ProfileState
+import com.example.cafebrown.utils.ArgumentKeys.FROM
 import com.example.cafebrown.utils.UIText
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -24,7 +25,8 @@ class ProfileViewModel(
         ProfileState(
             yearsList = (1320..1402).map { it.toString() },
             monthList = (1..12).map { it.toString() },
-            daysList = (1..31).map { it.toString() }
+            daysList = (1..31).map { it.toString() },
+            from = savedStateHandle.get<String>(FROM)!!
 //            response = Resource.Error("")
         )
     )
@@ -37,7 +39,12 @@ class ProfileViewModel(
         when (event) {
             is ProfileEvent.GetProfileData -> TODO()
             is ProfileEvent.PrepareData -> TODO()
-            is ProfileEvent.UpdateClicked -> TODO()
+            is ProfileEvent.UpdateClicked -> {
+                updateProfile()
+            }
+            is ProfileEvent.SignUpClicked -> {
+                signUp(event.onSignUpCompleted)
+            }
             is ProfileEvent.UpdateFirstNameState -> {
                 _profileState.value = profileState.value.copy(
                     firstName = event.newValue
@@ -71,6 +78,7 @@ class ProfileViewModel(
                 )
                 checkLeapYear(event.newValue.toInt())
             }
+
         }
     }
 
@@ -104,5 +112,68 @@ class ProfileViewModel(
 
             }
         }
+    }
+
+    private fun updateProfile() {
+        if (isValidInputs()) {
+
+        }
+    }
+    private fun signUp(onSignUpCompleted: () -> Unit){
+        if (isValidInputs()){
+//            _loginState.value = loginState.value.copy(
+//                response = Resource.Loading()
+//            )
+//            viewModelScope.launch {
+//                _loginState.value = loginState.value.copy(
+//                    response = signInUseCase.execute(signInState.value.textFieldStates[USERNAME],signInState.value.textFieldStates[PASSWORD])
+//                )
+//                if (_loginState.value.response.data?.statusCode == INVALID_USERNAME){
+//                    _uiEventFlow.emit(
+//                        SignInUIEvent.ShowMessage(
+//                            message = UIText.StringResource(
+//                                resId = R.string.invalid_login_info,
+//                                _signInState.value.textFieldStates[PASSWORD]
+//                            )
+//                        )
+//                    )
+//                }else if (_signInState.value.response.data?.statusCode == SUCCESS){
+//                }
+            onSignUpCompleted()
+        }
+
+    }
+
+    private fun isValidInputs():Boolean{
+        if (profileState.value.firstName.isEmpty()) {
+            viewModelScope.launch {
+                _uiEventFlow.emit(
+                    AppUIEvent.ShowMessage(
+                        message = UIText.StringResource(
+                            resId = R.string.empty_first_name,
+                            _profileState.value.firstName
+                        )
+                    )
+                )
+            }
+            return false
+        }
+        else if (profileState.value.lastName.isEmpty()) {
+            viewModelScope.launch {
+                _uiEventFlow.emit(
+                    AppUIEvent.ShowMessage(
+                        message = UIText.StringResource(
+                            resId = R.string.empty_last_name,
+                            _profileState.value.lastName
+                        )
+                    )
+                )
+            }
+            return false
+        }
+        else{
+            return true
+        }
+
     }
 }
