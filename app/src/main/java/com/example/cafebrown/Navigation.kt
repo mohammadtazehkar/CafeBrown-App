@@ -10,10 +10,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.cafebrown.ui.screens.*
+import com.example.cafebrown.utils.ArgumentKeys.CATEGORY_ID
 import com.example.cafebrown.utils.ArgumentKeys.FROM
 import com.example.cafebrown.utils.ArgumentKeys.MOBILE_NUMBER
 import com.example.cafebrown.utils.Destinations.HOME_SCREEN
 import com.example.cafebrown.utils.Destinations.LOGIN_SCREEN
+import com.example.cafebrown.utils.Destinations.MENU_LIST_SCREEN
+import com.example.cafebrown.utils.Destinations.PRODUCT_LIST_SCREEN
 import com.example.cafebrown.utils.Destinations.PROFILE_SCREEN
 import com.example.cafebrown.utils.Destinations.SPLASH_SCREEN
 import com.example.cafebrown.utils.Destinations.VERIFY_SCREEN
@@ -25,8 +28,8 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = SPLASH_SCREEN,
-//        startDestination = PROFILE_SCREEN,
+//        startDestination = SPLASH_SCREEN,
+        startDestination = MENU_LIST_SCREEN,
     ) {
 
         composable(
@@ -241,6 +244,80 @@ fun AppNavHost(
             )
         }
 
+        composable(
+            route = MENU_LIST_SCREEN,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+            MenuListScreen(
+                onNavigateToProductList = {categoryId->
+                    navController.navigate("$PRODUCT_LIST_SCREEN/$categoryId")
+                },
+                onNavUp = navController::navigateUp
+            )
+        }
+
+        composable(
+            route = "$PRODUCT_LIST_SCREEN/{$CATEGORY_ID}",
+            arguments = listOf(
+                navArgument(CATEGORY_ID) {
+                    type = NavType.IntType
+                    defaultValue = 0
+                }
+            ),
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+            ProductListScreen(
+                onNavigateToDetail = {
+                },
+                onNavUp = navController::navigateUp
+            )
+        }
 //        composable(
 //            route = MY_SERVICES_SCREEN,
 //            enterTransition = {

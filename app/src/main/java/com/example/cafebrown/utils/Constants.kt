@@ -12,6 +12,8 @@ object Destinations{
     const val VERIFY_SCREEN = "verify"
     const val PROFILE_SCREEN = "profile"
     const val HOME_SCREEN = "home"
+    const val MENU_LIST_SCREEN = "menuList"
+    const val PRODUCT_LIST_SCREEN = "productList"
 }
 //endregion
 
@@ -19,6 +21,7 @@ object Destinations{
 object ArgumentKeys{
     const val MOBILE_NUMBER = "mobileNumber"
     const val FROM = "from"
+    const val CATEGORY_ID = "categoryId"
 
 }
 //endregion

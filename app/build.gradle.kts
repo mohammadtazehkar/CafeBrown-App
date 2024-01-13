@@ -40,7 +40,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.2"
+        kotlinCompilerExtensionVersion = "1.5.4"
     }
     packaging {
         resources {
@@ -50,26 +50,28 @@ android {
 }
 
 dependencies {
-    val lifecycle_version = "2.6.2"
+    val lifecycle_version = "2.7.0"
     val nav_version = "2.7.6"
     val lottieVersion = "6.2.0"
 
     implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material:1.6.0-beta03")
-    implementation("com.google.android.material:material:1.12.0-alpha02")
+    implementation("androidx.compose.material:material:1.6.0-rc01")
+    implementation("com.google.android.material:material:1.12.0-alpha03")
     //lifecycle-viewmodel-compose
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
     //Navigation
     implementation("androidx.navigation:navigation-compose:$nav_version")
     //Lottie
     implementation("com.airbnb.android:lottie-compose:$lottieVersion")
+    // Coil
+    implementation("io.coil-kt:coil-compose:2.5.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
