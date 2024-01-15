@@ -12,6 +12,7 @@ object Destinations{
     const val VERIFY_SCREEN = "verify"
     const val PROFILE_SCREEN = "profile"
     const val HOME_SCREEN = "home"
+    const val TRANSACTION_SCREEN = "transaction"
 }
 //endregion
 

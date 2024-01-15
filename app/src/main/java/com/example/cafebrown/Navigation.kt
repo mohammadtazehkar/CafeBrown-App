@@ -15,6 +15,7 @@ import com.example.cafebrown.utils.Destinations.HOME_SCREEN
 import com.example.cafebrown.utils.Destinations.LOGIN_SCREEN
 import com.example.cafebrown.utils.Destinations.PROFILE_SCREEN
 import com.example.cafebrown.utils.Destinations.SPLASH_SCREEN
+import com.example.cafebrown.utils.Destinations.TRANSACTION_SCREEN
 import com.example.cafebrown.utils.Destinations.VERIFY_SCREEN
 
 @Composable
@@ -25,7 +26,7 @@ fun AppNavHost(
     NavHost(
         navController = navController,
 //        startDestination = SPLASH_SCREEN,
-        startDestination = PROFILE_SCREEN,
+        startDestination = TRANSACTION_SCREEN,
     ) {
 
         composable(
@@ -239,6 +240,37 @@ fun AppNavHost(
 //                        }
 //                    }
 //                }
+            )
+        }
+        composable(
+            route = TRANSACTION_SCREEN,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+            TransactionScreen(
+                onNavUp = navController::navigateUp
             )
         }
 
