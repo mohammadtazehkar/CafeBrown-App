@@ -156,7 +156,8 @@ fun ProfileScreen(
                 PrimaryButton(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     text = stringResource(
                         id =
                         if (profileState.value.from == VERIFY_SCREEN) {

@@ -48,7 +48,7 @@ import com.example.cafebrown.utils.ClickHelper
 @Composable
 fun ProductListScreen(
     productListViewModel: ProductListViewModel = viewModel(),
-    onNavigateToDetail: (Int)->Unit,
+    onNavigateToDetail: (Int,String)->Unit,
     onNavUp: ()->Unit,
 ){
     val productState = productListViewModel.productListState
@@ -113,40 +113,48 @@ fun SubCategoryListItem(
     item: SubCategoryItemData,
     onItemClick: (Int) -> Unit
 ) {
-    if (item.isSelected){
+//    if (item.isSelected){
         Column (
             modifier = Modifier
                 .clip(MaterialTheme.shapes.small)// clip to the circle shape
-                .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                .border(
+                    1.dp,
+                    if (item.isSelected){MaterialTheme.colorScheme.primary}else{MaterialTheme.colorScheme.onPrimaryContainer},
+                    CircleShape
+                )
                 .clickable {
                     ClickHelper
                         .getInstance()
                         .clickOnce { onItemClick(item.id) }
                 }
         ){
-            TextTitleSmallPrimary(modifier = Modifier.padding(horizontal = 16.dp,vertical = 4.dp),text = item.title)
-        }
-    }else{
-        Column (
-            modifier = Modifier
-                .clip(MaterialTheme.shapes.small)// clip to the circle shape
-                .border(1.dp, MaterialTheme.colorScheme.onPrimaryContainer, CircleShape)
-                .clickable {
-                    ClickHelper
-                        .getInstance()
-                        .clickOnce { onItemClick(item.id) }
+                if (item.isSelected){
+                    TextTitleSmallPrimary(modifier = Modifier.padding(horizontal = 16.dp,vertical = 4.dp),text = item.title)
+                }else{
+                    TextTitleSmall(modifier = Modifier.padding(horizontal = 16.dp,vertical = 4.dp),text = item.title)
                 }
-        ){
-            TextTitleSmall(modifier = Modifier.padding(horizontal = 16.dp,vertical = 4.dp),text = item.title)
         }
-
-    }
+//    }else{
+//        Column (
+//            modifier = Modifier
+//                .clip(MaterialTheme.shapes.small)// clip to the circle shape
+//                .border(1.dp, MaterialTheme.colorScheme.onPrimaryContainer, CircleShape)
+//                .clickable {
+//                    ClickHelper
+//                        .getInstance()
+//                        .clickOnce { onItemClick(item.id) }
+//                }
+//        ){
+//            TextTitleSmall(modifier = Modifier.padding(horizontal = 16.dp,vertical = 4.dp),text = item.title)
+//        }
+//
+//    }
 }
 
 @Composable
 fun ProductGrid(
     items : List<ProductListItemData>,
-    onItemClick : (Int) -> Unit
+    onItemClick : (Int,String) -> Unit
 ){
     LazyVerticalGrid(
         modifier = Modifier
@@ -166,7 +174,7 @@ fun ProductGrid(
 fun ProductGridItem(
     isOdd: Boolean,
     item: ProductListItemData,
-    onItemClick: (Int) -> Unit
+    onItemClick: (Int,String) -> Unit
 ) {
     val configuration = LocalConfiguration.current
     val itemSize = 0.23 * configuration.screenWidthDp.dp
@@ -176,7 +184,7 @@ fun ProductGridItem(
             .clickable {
                 ClickHelper
                     .getInstance()
-                    .clickOnce { onItemClick(item.id) }
+                    .clickOnce { onItemClick(item.id,item.title) }
             }
             .height(IntrinsicSize.Max)
     ) {
@@ -228,4 +236,4 @@ fun ProductGridItem(
 }
 
 data class ProductListItemData(val id : Int, val title: String, val fee: String,val categoryId: Int, val resId : Int)
-data class SubCategoryItemData(val id : Int, val title: String, var isSelected: Boolean)
+data class SubCategoryItemData(var id : Int, var title: String, var isSelected: Boolean)

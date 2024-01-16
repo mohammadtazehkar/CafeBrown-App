@@ -13,9 +13,12 @@ import com.example.cafebrown.ui.screens.*
 import com.example.cafebrown.utils.ArgumentKeys.CATEGORY_ID
 import com.example.cafebrown.utils.ArgumentKeys.FROM
 import com.example.cafebrown.utils.ArgumentKeys.MOBILE_NUMBER
+import com.example.cafebrown.utils.ArgumentKeys.PRODUCT_ID
+import com.example.cafebrown.utils.ArgumentKeys.PRODUCT_TITLE
 import com.example.cafebrown.utils.Destinations.HOME_SCREEN
 import com.example.cafebrown.utils.Destinations.LOGIN_SCREEN
 import com.example.cafebrown.utils.Destinations.MENU_LIST_SCREEN
+import com.example.cafebrown.utils.Destinations.PRODUCT_DETAIL_SCREEN
 import com.example.cafebrown.utils.Destinations.PRODUCT_LIST_SCREEN
 import com.example.cafebrown.utils.Destinations.PROFILE_SCREEN
 import com.example.cafebrown.utils.Destinations.SPLASH_SCREEN
@@ -313,8 +316,51 @@ fun AppNavHost(
             }
         ) {
             ProductListScreen(
-                onNavigateToDetail = {
+                onNavigateToDetail = {productId,productTitle ->
+                    navController.navigate("$PRODUCT_DETAIL_SCREEN/$productId/$productTitle")
                 },
+                onNavUp = navController::navigateUp
+            )
+        }
+
+        composable(
+            route = "$PRODUCT_DETAIL_SCREEN/{$PRODUCT_ID}/{$PRODUCT_TITLE}",
+            arguments = listOf(
+                navArgument(PRODUCT_ID) {
+                    type = NavType.IntType
+                    defaultValue = 0
+                },
+                navArgument(PRODUCT_TITLE) {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            ),
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+            ProductDetailScreen(
                 onNavUp = navController::navigateUp
             )
         }

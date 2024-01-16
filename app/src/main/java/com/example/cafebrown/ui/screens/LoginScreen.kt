@@ -123,7 +123,8 @@ fun LoginScreen(
                 PrimaryButton(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     text = stringResource(id = R.string.send),
                     onClick = {
                         loginViewModel.onEvent(LoginEvent.LoginClicked(onNavigateToVerify = onNavigateToVerify))

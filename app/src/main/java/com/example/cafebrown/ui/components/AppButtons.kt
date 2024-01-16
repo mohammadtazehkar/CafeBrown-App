@@ -44,7 +44,7 @@ fun PrimaryButton(
     onClick: () -> Unit
 ){
     Button(
-        modifier = modifier.padding(16.dp),
+        modifier = modifier,
         onClick = { ClickHelper.getInstance().clickOnce { onClick() }},
         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
         shape = MaterialTheme.shapes.small

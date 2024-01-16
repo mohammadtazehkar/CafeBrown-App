@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,7 +33,7 @@ fun MainColumn(
     modifier: Modifier = Modifier,
     verticalArrangement : Arrangement.Vertical = Arrangement.Center,
     horizontalAlignment : Alignment.Horizontal = Alignment.CenterHorizontally,
-    content: @Composable () -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
     val image = ImageBitmap.imageResource(R.drawable.img_main_pattern)
     // Define the scale factor for the repeated image
