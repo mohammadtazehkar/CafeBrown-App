@@ -1,8 +1,12 @@
 package com.example.cafebrown.utils
 
 object Constants {
-//    const val FOR_ADD = "forAdd"
-
+    const val NAV_MENU = 1
+    const val NAV_TABLE = 2
+    const val NAV_RESERVE = 3
+    const val NAV_TRANSACTION = 4
+    const val NAV_PROFILE = 5
+    const val NAV_INFO = 6
 }
 
 //region Destinations

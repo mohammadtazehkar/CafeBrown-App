@@ -11,6 +11,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.cafebrown.ui.screens.*
 import com.example.cafebrown.utils.ArgumentKeys.MOBILE_NUMBER
+import com.example.cafebrown.utils.Constants.NAV_INFO
+import com.example.cafebrown.utils.Constants.NAV_MENU
+import com.example.cafebrown.utils.Constants.NAV_PROFILE
+import com.example.cafebrown.utils.Constants.NAV_RESERVE
+import com.example.cafebrown.utils.Constants.NAV_TABLE
+import com.example.cafebrown.utils.Constants.NAV_TRANSACTION
 import com.example.cafebrown.utils.Destinations.HOME_SCREEN
 import com.example.cafebrown.utils.Destinations.LOGIN_SCREEN
 import com.example.cafebrown.utils.Destinations.PROFILE_SCREEN
@@ -179,21 +185,17 @@ fun AppNavHost(
             }
         ) {
             HomeScreen(
-//                onNavigateToAddService = { catId,catTitle ->
-//                    navController.navigate("$ADD_SERVICE_SCREEN/$catId/$catTitle")
-//                },
-//                onDrawerItemClick = { navigateTo ->
-//                    if (navigateTo.isNotEmpty()) {
-//                        navController.navigate(navigateTo)
-//                    }
-//                },
-//                onLogoutCompleted = {
-//                    navController.navigate(SPLASH_SCREEN){
-//                        popUpTo(HOME_SCREEN) {
-//                            inclusive = true
-//                        }
-//                    }
-//                }
+                onClickItem = {navType ->
+                    when(navType){
+                        NAV_MENU -> {}
+                        NAV_TABLE -> {}
+                        NAV_RESERVE -> {}
+                        NAV_TRANSACTION -> {}
+                        NAV_PROFILE -> {}
+                        NAV_INFO -> {}
+                    }
+
+                }
             )
         }
         composable(

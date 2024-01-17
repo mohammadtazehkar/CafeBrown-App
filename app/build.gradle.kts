@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -53,6 +55,7 @@ dependencies {
     val lifecycle_version = "2.6.2"
     val nav_version = "2.7.6"
     val lottieVersion = "6.2.0"
+    val hilt_version = "2.48.1"
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
@@ -64,13 +67,17 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material:1.6.0-beta03")
     implementation("com.google.android.material:material:1.12.0-alpha02")
+    implementation("io.coil-kt:coil-compose:2.5.0")
     //lifecycle-viewmodel-compose
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
     //Navigation
     implementation("androidx.navigation:navigation-compose:$nav_version")
     //Lottie
     implementation("com.airbnb.android:lottie-compose:$lottieVersion")
-
+    //Hilt
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0-alpha01")
+    implementation("com.google.dagger:hilt-android:$hilt_version")
+    kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
