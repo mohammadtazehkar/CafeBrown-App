@@ -21,6 +21,7 @@ import com.example.cafebrown.utils.Constants.NAV_PROFILE
 import com.example.cafebrown.utils.Constants.NAV_RESERVE
 import com.example.cafebrown.utils.Constants.NAV_TABLE
 import com.example.cafebrown.utils.Constants.NAV_TRANSACTION
+import com.example.cafebrown.utils.Destinations.ABOUT_US_SCREEN
 import com.example.cafebrown.utils.Destinations.HOME_SCREEN
 import com.example.cafebrown.utils.Destinations.LOGIN_SCREEN
 import com.example.cafebrown.utils.Destinations.MENU_LIST_SCREEN
@@ -38,8 +39,8 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = SPLASH_SCREEN,
-//        startDestination = MENU_LIST_SCREEN,
+//        startDestination = SPLASH_SCREEN,
+        startDestination = ABOUT_US_SCREEN,
     ) {
 
         composable(
@@ -193,19 +194,22 @@ fun AppNavHost(
             }
         ) {
             HomeScreen(
-                onClickItem = {navType ->
-                    when(navType){
+                onClickItem = { navType ->
+                    when (navType) {
                         NAV_MENU -> {
                             navController.navigate(MENU_LIST_SCREEN)
                         }
+
                         NAV_TABLE -> {}
                         NAV_RESERVE -> {}
                         NAV_TRANSACTION -> {
                             navController.navigate(TRANSACTION_SCREEN)
                         }
+
                         NAV_PROFILE -> {
                             navController.navigate("$PROFILE_SCREEN/$HOME_SCREEN")
                         }
+
                         NAV_INFO -> {}
                     }
 
@@ -284,7 +288,7 @@ fun AppNavHost(
             }
         ) {
             MenuListScreen(
-                onNavigateToProductList = {categoryId->
+                onNavigateToProductList = { categoryId ->
                     navController.navigate("$PRODUCT_LIST_SCREEN/$categoryId")
                 },
                 onNavUp = navController::navigateUp
@@ -325,7 +329,7 @@ fun AppNavHost(
             }
         ) {
             ProductListScreen(
-                onNavigateToDetail = {productId,productTitle ->
+                onNavigateToDetail = { productId, productTitle ->
                     navController.navigate("$PRODUCT_DETAIL_SCREEN/$productId/$productTitle")
                 },
                 onNavUp = navController::navigateUp
@@ -401,6 +405,38 @@ fun AppNavHost(
             }
         ) {
             ProductDetailScreen(
+                onNavUp = navController::navigateUp
+            )
+        }
+
+        composable(
+            route = ABOUT_US_SCREEN,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+            AboutUsScreen(
                 onNavUp = navController::navigateUp
             )
         }
