@@ -22,6 +22,7 @@ import com.example.cafebrown.utils.Destinations.PRODUCT_DETAIL_SCREEN
 import com.example.cafebrown.utils.Destinations.PRODUCT_LIST_SCREEN
 import com.example.cafebrown.utils.Destinations.PROFILE_SCREEN
 import com.example.cafebrown.utils.Destinations.SPLASH_SCREEN
+import com.example.cafebrown.utils.Destinations.TRANSACTION_SCREEN
 import com.example.cafebrown.utils.Destinations.VERIFY_SCREEN
 
 @Composable
@@ -319,6 +320,37 @@ fun AppNavHost(
                 onNavigateToDetail = {productId,productTitle ->
                     navController.navigate("$PRODUCT_DETAIL_SCREEN/$productId/$productTitle")
                 },
+                onNavUp = navController::navigateUp
+            )
+        }
+        composable(
+            route = TRANSACTION_SCREEN,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+            TransactionScreen(
                 onNavUp = navController::navigateUp
             )
         }
