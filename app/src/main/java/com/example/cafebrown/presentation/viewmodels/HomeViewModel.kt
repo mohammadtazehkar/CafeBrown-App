@@ -4,7 +4,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.cafebrown.presentation.states.HomeState
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 class HomeViewModel : ViewModel() {
 
