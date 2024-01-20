@@ -9,5 +9,8 @@ data class ProductListState(
     var selectedCategoryId: Int,
     var subCategoryListState : List<SubCategoryItemData> = mutableListOf(),
     var productListState : List<ProductListItemData> = mutableListOf(),
+    var from : String,
+    var total: Int,
+    var selectedCount: Int
 //    var response: Resource<APIHomeDataResponse>
 )

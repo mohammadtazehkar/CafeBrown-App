@@ -37,10 +37,10 @@ import com.example.cafebrown.utils.ClickHelper
 @Composable
 fun MenuListScreen(
     menuListViewModel: MenuListViewModel = viewModel(),
-    onNavigateToProductList: (Int) -> Unit,
+    onNavigateToProductList: (Int,String) -> Unit,
     onNavUp: () -> Unit,
 ) {
-    val menuState = menuListViewModel.menuState
+    val menuState = menuListViewModel.menuState.value
     Scaffold(
         topBar = {
             AppTopAppBar(
@@ -56,8 +56,10 @@ fun MenuListScreen(
             ) {
 //                if (categoryList.isNotEmpty()) {
                 MenuGrid(
-                    items = menuState.value.menuListState,
-                    onItemClick = onNavigateToProductList
+                    items = menuState.menuListState,
+                    onItemClick = {
+                        onNavigateToProductList(it, menuState.from)
+                    }
                 )
 //                } else {
 //                    Column(

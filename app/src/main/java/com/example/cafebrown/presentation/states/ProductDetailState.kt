@@ -10,6 +10,7 @@ data class ProductDetailState(
     var productTitle: String,
     var productDescription: String = "",
     var productInstruction: String = "",
-    var userComment: String = ""
+    var userComment: String = "",
+    var imageList: List<String>
 //    var response : Resource<APISignInResponse>
 )

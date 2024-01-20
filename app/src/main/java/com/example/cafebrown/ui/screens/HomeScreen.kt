@@ -41,6 +41,7 @@ import com.example.cafebrown.presentation.viewmodels.HomeViewModel
 import com.example.cafebrown.ui.components.AppBannerPager
 import com.example.cafebrown.ui.components.AppTopAppBar
 import com.example.cafebrown.ui.components.CardColumnMediumCorner
+import com.example.cafebrown.ui.components.MainColumn
 import com.example.cafebrown.ui.components.PrimaryButtonMainItemWithImage
 import com.example.cafebrown.ui.components.TextTitleMedium
 import com.example.cafebrown.ui.theme.AppTheme
@@ -86,11 +87,9 @@ fun HomeContent(
     imageList: List<String>,
     onClickItems: (Int) -> Unit
 ) {
-    Column(
+    MainColumn(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState()),
     ) {
         AppBannerPager(
             modifier = Modifier.weight(0.3f),
@@ -100,7 +99,6 @@ fun HomeContent(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier
                 .weight(0.7f)
-                .padding(8.dp)
         ) {
 
             Row(modifier = Modifier
@@ -110,28 +108,28 @@ fun HomeContent(
                 Divider(modifier = Modifier
                     .width(1.dp)
                     .fillMaxHeight()
-                    .padding(vertical = 8.dp))
-                HomeItem(modifier = Modifier.weight(0.5f).fillMaxHeight(),imageId = R.mipmap.ic_reserve, label = stringResource(id = R.string.menu),onClickItem = onClickItems, naveItem = NAV_TABLE)
+                    .padding(vertical = 16.dp))
+                HomeItem(modifier = Modifier.weight(0.5f).fillMaxHeight(),imageId = R.mipmap.ic_reserve, label = stringResource(id = R.string.desk_reserve_and_order),onClickItem = onClickItems, naveItem = NAV_TABLE)
             }
             Row(modifier = Modifier
                 .weight(1f)
                 .height(IntrinsicSize.Max)) {
-                HomeItem(modifier = Modifier.weight(0.5f).fillMaxHeight(),imageId = R.mipmap.ic_history, label = stringResource(id = R.string.menu),onClickItem = onClickItems, naveItem = NAV_RESERVE)
+                HomeItem(modifier = Modifier.weight(0.5f).fillMaxHeight(),imageId = R.mipmap.ic_history, label = stringResource(id = R.string.reserve_history),onClickItem = onClickItems, naveItem = NAV_RESERVE)
                 Divider(modifier = Modifier
                     .width(1.dp)
                     .fillMaxHeight()
-                    .padding(vertical = 8.dp))
-                HomeItem(modifier = Modifier.weight(0.5f).fillMaxHeight(),imageId = R.mipmap.ic_transaction, label = stringResource(id = R.string.menu),onClickItem = onClickItems, naveItem = NAV_TRANSACTION)
+                    .padding(vertical = 16.dp))
+                HomeItem(modifier = Modifier.weight(0.5f).fillMaxHeight(),imageId = R.mipmap.ic_transaction, label = stringResource(id = R.string.transaction),onClickItem = onClickItems, naveItem = NAV_TRANSACTION)
             }
             Row(modifier = Modifier
                 .weight(1f)
                 .height(IntrinsicSize.Max)) {
-                HomeItem(modifier = Modifier.weight(0.5f).fillMaxHeight(),imageId = R.mipmap.ic_profile, label = stringResource(id = R.string.menu), false,onClickItems,NAV_PROFILE)
+                HomeItem(modifier = Modifier.weight(0.5f).fillMaxHeight(),imageId = R.mipmap.ic_profile, label = stringResource(id = R.string.profile), false,onClickItems,NAV_PROFILE)
                 Divider(modifier = Modifier
                     .width(1.dp)
                     .fillMaxHeight()
-                    .padding(vertical = 8.dp))
-                HomeItem(modifier = Modifier.weight(0.5f).fillMaxHeight(),imageId = R.mipmap.ic_info, label = stringResource(id = R.string.menu), false,onClickItems,NAV_INFO)
+                    .padding(vertical = 16.dp))
+                HomeItem(modifier = Modifier.weight(0.5f).fillMaxHeight(),imageId = R.mipmap.ic_info, label = stringResource(id = R.string.about_us), false,onClickItems,NAV_INFO)
             }
         }
 

@@ -594,6 +594,38 @@ fun TextTitleLargeOnSecondary(
         modifier = modifier
     )
 }
+
+@Composable
+fun TextTitleMediumError(
+    modifier: Modifier = Modifier,
+    text: String,
+    textAlign: TextAlign = TextAlign.Center,
+    fontWeight: FontWeight? = null
+){
+    Text(
+        text = text ,
+        style = MaterialTheme.typography.titleMedium,
+        textAlign = textAlign,
+        color = MaterialTheme.colorScheme.error,
+        fontWeight = fontWeight,
+        modifier = modifier
+    )
+}@Composable
+fun TextTitleSmallError(
+    modifier: Modifier = Modifier,
+    text: String,
+    textAlign: TextAlign = TextAlign.Center,
+    fontWeight: FontWeight? = null
+){
+    Text(
+        text = text ,
+        style = MaterialTheme.typography.titleSmall,
+        textAlign = textAlign,
+        color = MaterialTheme.colorScheme.error,
+        fontWeight = fontWeight,
+        modifier = modifier
+    )
+}
 //endregion
 
 //region Body

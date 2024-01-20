@@ -43,6 +43,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cafebrown.R
 import com.example.cafebrown.presentation.events.ProductDetailEvent
 import com.example.cafebrown.presentation.viewmodels.ProductDetailViewModel
+import com.example.cafebrown.ui.components.AppBannerPager
 import com.example.cafebrown.ui.components.AppTopAppBar
 import com.example.cafebrown.ui.components.MainColumn
 import com.example.cafebrown.ui.components.PrimaryButton
@@ -71,12 +72,12 @@ fun ProductDetailScreen(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
                     .padding(paddingValues)
-                    .padding(horizontal = 16.dp)
             ) {
 
-                ProductSlider(modifier = Modifier.height(sliderHeight))
+                ProductSlider(modifier = Modifier.height(sliderHeight),productDetailState.imageList)
                 Spacer(modifier = Modifier.height(8.dp))
                 ProductDetail(
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     productStars = productDetailState.productStarsList,
                     userStars = productDetailState.userStarsList,
                     onStarsClick = {index,status ->
@@ -96,9 +97,13 @@ fun ProductDetailScreen(
 
 @Composable
 fun ProductSlider(
-    modifier: Modifier
+    modifier: Modifier,
+    imageList: List<String>,
 ){
     Column(modifier = modifier) {
+        AppBannerPager(
+            images = imageList
+        )
     }
 }
 

@@ -93,6 +93,26 @@ fun PrimaryButton(
 }
 
 @Composable
+fun PrimarySmallButton(
+    modifier: Modifier,
+    text: String,
+    onClick: () -> Unit
+){
+    Button(
+        modifier = modifier,
+        onClick = { ClickHelper.getInstance().clickOnce { onClick() }},
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+        shape = MaterialTheme.shapes.small
+    ) {
+        TextTitleSmallOnPrimary(
+            modifier = Modifier,
+            text = text,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
 fun SecondaryButton(
     text: String,
     onClick: () -> Unit

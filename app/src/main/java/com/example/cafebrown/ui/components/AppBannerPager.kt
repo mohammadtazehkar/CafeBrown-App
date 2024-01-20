@@ -87,7 +87,7 @@ fun AppBannerPager(
         ) {
             Box(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.onPrimary)
+                    .background(MaterialTheme.colorScheme.background)
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {

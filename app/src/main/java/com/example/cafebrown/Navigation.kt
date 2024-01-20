@@ -21,12 +21,15 @@ import com.example.cafebrown.utils.Constants.NAV_PROFILE
 import com.example.cafebrown.utils.Constants.NAV_RESERVE
 import com.example.cafebrown.utils.Constants.NAV_TABLE
 import com.example.cafebrown.utils.Constants.NAV_TRANSACTION
+import com.example.cafebrown.utils.Destinations.DESK_SCREEN
 import com.example.cafebrown.utils.Destinations.HOME_SCREEN
 import com.example.cafebrown.utils.Destinations.LOGIN_SCREEN
 import com.example.cafebrown.utils.Destinations.MENU_LIST_SCREEN
 import com.example.cafebrown.utils.Destinations.PRODUCT_DETAIL_SCREEN
 import com.example.cafebrown.utils.Destinations.PRODUCT_LIST_SCREEN
 import com.example.cafebrown.utils.Destinations.PROFILE_SCREEN
+import com.example.cafebrown.utils.Destinations.RESERVE_HISTORY_SCREEN
+import com.example.cafebrown.utils.Destinations.RESERVE_SCREEN
 import com.example.cafebrown.utils.Destinations.SPLASH_SCREEN
 import com.example.cafebrown.utils.Destinations.TRANSACTION_SCREEN
 import com.example.cafebrown.utils.Destinations.VERIFY_SCREEN
@@ -38,8 +41,8 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = SPLASH_SCREEN,
-//        startDestination = MENU_LIST_SCREEN,
+//        startDestination = SPLASH_SCREEN,
+        startDestination = HOME_SCREEN,
     ) {
 
         composable(
@@ -193,19 +196,25 @@ fun AppNavHost(
             }
         ) {
             HomeScreen(
-                onClickItem = {navType ->
-                    when(navType){
+                onClickItem = { navType ->
+                    when (navType) {
                         NAV_MENU -> {
-                            navController.navigate(MENU_LIST_SCREEN)
+                            navController.navigate("$MENU_LIST_SCREEN/$HOME_SCREEN")
                         }
-                        NAV_TABLE -> {}
-                        NAV_RESERVE -> {}
+
+                        NAV_TABLE -> {
+                            navController.navigate(DESK_SCREEN)
+                        }
+
+                        NAV_RESERVE -> {navController.navigate(RESERVE_HISTORY_SCREEN)}
                         NAV_TRANSACTION -> {
                             navController.navigate(TRANSACTION_SCREEN)
                         }
+
                         NAV_PROFILE -> {
                             navController.navigate("$PROFILE_SCREEN/$HOME_SCREEN")
                         }
+
                         NAV_INFO -> {}
                     }
 
@@ -252,12 +261,19 @@ fun AppNavHost(
                             inclusive = true
                         }
                     }
-                }
+                },
+                onNavUp = navController::navigateUp
             )
         }
 
         composable(
-            route = MENU_LIST_SCREEN,
+            route = "$MENU_LIST_SCREEN/{$FROM}",
+            arguments = listOf(
+                navArgument(FROM) {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            ),
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
@@ -284,15 +300,15 @@ fun AppNavHost(
             }
         ) {
             MenuListScreen(
-                onNavigateToProductList = {categoryId->
-                    navController.navigate("$PRODUCT_LIST_SCREEN/$categoryId")
+                onNavigateToProductList = { categoryId, from ->
+                    navController.navigate("$PRODUCT_LIST_SCREEN/$categoryId/$from")
                 },
                 onNavUp = navController::navigateUp
             )
         }
 
         composable(
-            route = "$PRODUCT_LIST_SCREEN/{$CATEGORY_ID}",
+            route = "$PRODUCT_LIST_SCREEN/{$CATEGORY_ID}/{$FROM}",
             arguments = listOf(
                 navArgument(CATEGORY_ID) {
                     type = NavType.IntType
@@ -325,7 +341,7 @@ fun AppNavHost(
             }
         ) {
             ProductListScreen(
-                onNavigateToDetail = {productId,productTitle ->
+                onNavigateToDetail = { productId, productTitle ->
                     navController.navigate("$PRODUCT_DETAIL_SCREEN/$productId/$productTitle")
                 },
                 onNavUp = navController::navigateUp
@@ -401,6 +417,110 @@ fun AppNavHost(
             }
         ) {
             ProductDetailScreen(
+                onNavUp = navController::navigateUp
+            )
+        }
+        composable(
+            route = DESK_SCREEN,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+            DeskListScreen(
+                onNavigateToReserve = {
+                    navController.navigate(RESERVE_SCREEN)
+                },
+                onNavUp = navController::navigateUp
+            )
+        }
+        composable(
+            route = RESERVE_SCREEN,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+
+            ReserveScreen(
+                onNavigateToMenu = {
+                    navController.navigate("$MENU_LIST_SCREEN/$RESERVE_SCREEN")
+                },
+                onNavUp = navController::navigateUp
+            )
+        }
+        composable(
+            route = RESERVE_HISTORY_SCREEN,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+
+            ReserveHistoryScreen(
+                onNavigateToReserve = {
+                    navController.navigate(RESERVE_SCREEN)
+                },
                 onNavUp = navController::navigateUp
             )
         }

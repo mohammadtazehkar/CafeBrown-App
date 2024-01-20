@@ -54,7 +54,8 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun ProfileScreen(
     profileViewModel: ProfileViewModel = viewModel(),
-    onSignUpCompleted: () -> Unit
+    onSignUpCompleted: () -> Unit,
+    onNavUp: () -> Unit
 ) {
     val context = LocalContext.current
     val profileState = profileViewModel.profileState
@@ -80,7 +81,9 @@ fun ProfileScreen(
                     stringResource(id = R.string.sign_up)
                 } else {
                     stringResource(id = R.string.profile)
-                }
+                },
+                isBackVisible = profileState.value.from != VERIFY_SCREEN,
+                onBack = onNavUp
             )
         },
         snackbarHost = {

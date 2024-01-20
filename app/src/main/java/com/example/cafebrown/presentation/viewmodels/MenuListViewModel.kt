@@ -2,18 +2,22 @@ package com.example.cafebrown.presentation.viewmodels
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.cafebrown.R
 import com.example.cafebrown.presentation.events.AppUIEvent
 import com.example.cafebrown.presentation.events.MenuEvent
 import com.example.cafebrown.presentation.states.MenuState
 import com.example.cafebrown.ui.screens.MenuItemData
+import com.example.cafebrown.utils.ArgumentKeys
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 //@HiltViewModel
 //class SignInViewModel @Inject constructor (private val signInUseCase: SignInUseCase) : ViewModel() {
-class MenuListViewModel : ViewModel() {
+class MenuListViewModel(
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
     private val _menuState = mutableStateOf(
         MenuState(
             menuListState = listOf(
@@ -41,8 +45,9 @@ class MenuListViewModel : ViewModel() {
                 MenuItemData(
                     8, "صبحانه", R.drawable.breakfast
                 )
-            )
-//            response = Resource.Error("")
+            ),
+//            response = Resource.Error(""),
+            from = savedStateHandle.get<String>(ArgumentKeys.FROM)!!
         )
     )
     val menuState: State<MenuState> = _menuState
@@ -51,7 +56,7 @@ class MenuListViewModel : ViewModel() {
     val uiEventFlow = _uiEventFlow.asSharedFlow()
 
     fun onEvent(event: MenuEvent) {
-        when(event){
+        when (event) {
             is MenuEvent.UpdateLoading -> TODO()
         }
     }

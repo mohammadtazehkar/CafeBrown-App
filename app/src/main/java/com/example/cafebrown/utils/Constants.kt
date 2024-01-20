@@ -20,6 +20,9 @@ object Destinations{
     const val PRODUCT_LIST_SCREEN = "productList"
     const val PRODUCT_DETAIL_SCREEN = "productDetail"
     const val TRANSACTION_SCREEN = "transaction"
+    const val DESK_SCREEN = "deck"
+    const val RESERVE_SCREEN = "reserve"
+    const val RESERVE_HISTORY_SCREEN = "reserveHistory"
 }
 //endregion
 

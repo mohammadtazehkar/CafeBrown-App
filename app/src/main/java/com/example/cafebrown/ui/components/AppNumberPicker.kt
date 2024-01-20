@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -32,6 +33,7 @@ import kotlinx.coroutines.flow.map
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppNumberPicker(
+    width: Dp = 64.dp,
     items: List<String>,
     startIndex: Int = 0,
     visibleItemsCount: Int = 3,
@@ -72,7 +74,7 @@ fun AppNumberPicker(
             state = listState,
             flingBehavior = flingBehavior,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.width(64.dp)
+            modifier = Modifier.width(width)
                 .height(itemHeightDp * visibleItemsCount)
                 .fadingEdge(fadingEdgeGradient)
         ) {
@@ -86,11 +88,11 @@ fun AppNumberPicker(
         }
         Divider(
             color = dividerColor,
-            modifier = Modifier.offset(y = itemHeightDp * visibleItemsMiddle).width(64.dp)
+            modifier = Modifier.offset(y = itemHeightDp * visibleItemsMiddle).width(width )
         )
         Divider(
             color = dividerColor,
-            modifier = Modifier.offset(y = itemHeightDp * (visibleItemsMiddle + 1)).width(64.dp)
+            modifier = Modifier.offset(y = itemHeightDp * (visibleItemsMiddle + 1)).width(width)
         )
 
     }
