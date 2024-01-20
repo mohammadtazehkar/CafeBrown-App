@@ -26,22 +26,30 @@ import com.example.cafebrown.ui.components.TextTitleSmallOnSecondary
 
 @Composable
 fun RulesDialog(
+    isFromAboutUs: Boolean = false,
     onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit
-){
+    onConfirmation: () -> Unit = {}
+) {
     Dialog(
         onDismissRequest = { onDismissRequest() },
         properties = DialogProperties(
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false
+            dismissOnBackPress = isFromAboutUs,
+            dismissOnClickOutside = isFromAboutUs
         )
-    )  {
+    ) {
         CardColumnMediumCorner(columnModifier = Modifier.verticalScroll(rememberScrollState())) {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl)
             {
-                TextTitleMedium(text = stringResource(id = R.string.app_rules), textAlign = TextAlign.Justify)
+                TextTitleMedium(
+                    text = stringResource(id = R.string.app_rules),
+                    textAlign = TextAlign.Justify
+                )
             }
-            PrimaryButton(text = stringResource(id = R.string.accept_rules), onClick = onConfirmation)
+            if (!isFromAboutUs)
+                PrimaryButton(
+                    text = stringResource(id = R.string.accept_rules),
+                    onClick = onConfirmation
+                )
         }
     }
 }

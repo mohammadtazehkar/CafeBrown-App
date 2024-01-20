@@ -22,6 +22,7 @@ import com.example.cafebrown.utils.Constants.NAV_RESERVE
 import com.example.cafebrown.utils.Constants.NAV_TABLE
 import com.example.cafebrown.utils.Constants.NAV_TRANSACTION
 import com.example.cafebrown.utils.Destinations.DESK_SCREEN
+import com.example.cafebrown.utils.Destinations.ABOUT_US_SCREEN
 import com.example.cafebrown.utils.Destinations.HOME_SCREEN
 import com.example.cafebrown.utils.Destinations.LOGIN_SCREEN
 import com.example.cafebrown.utils.Destinations.MENU_LIST_SCREEN
@@ -41,8 +42,8 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-//        startDestination = SPLASH_SCREEN,
-        startDestination = HOME_SCREEN,
+        startDestination = SPLASH_SCREEN,
+//        startDestination = MENU_LIST_SCREEN,
     ) {
 
         composable(
@@ -210,11 +211,9 @@ fun AppNavHost(
                         NAV_TRANSACTION -> {
                             navController.navigate(TRANSACTION_SCREEN)
                         }
-
                         NAV_PROFILE -> {
                             navController.navigate("$PROFILE_SCREEN/$HOME_SCREEN")
                         }
-
                         NAV_INFO -> {}
                     }
 
@@ -521,6 +520,38 @@ fun AppNavHost(
                 onNavigateToReserve = {
                     navController.navigate(RESERVE_SCREEN)
                 },
+                onNavUp = navController::navigateUp
+            )
+        }
+
+        composable(
+            route = ABOUT_US_SCREEN,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                    animationSpec = tween(500)
+                )
+            }
+        ) {
+            AboutUsScreen(
                 onNavUp = navController::navigateUp
             )
         }

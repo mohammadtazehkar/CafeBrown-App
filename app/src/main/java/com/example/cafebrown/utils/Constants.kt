@@ -23,6 +23,7 @@ object Destinations{
     const val DESK_SCREEN = "deck"
     const val RESERVE_SCREEN = "reserve"
     const val RESERVE_HISTORY_SCREEN = "reserveHistory"
+    const val ABOUT_US_SCREEN = "aboutUS"
 }
 //endregion
 
