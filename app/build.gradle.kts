@@ -1,6 +1,9 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -53,6 +56,12 @@ dependencies {
     val lifecycle_version = "2.7.0"
     val nav_version = "2.7.6"
     val lottieVersion = "6.2.0"
+    val room_version = "2.6.1"
+    val coroutines_version = "1.7.3"
+    val retrofit_version = "2.9.0"
+    val interceptor_version = "4.12.0"
+    val hilt_version = "2.48.1"
+
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
@@ -72,6 +81,30 @@ dependencies {
     implementation("com.airbnb.android:lottie-compose:$lottieVersion")
     // Coil
     implementation("io.coil-kt:coil-compose:2.5.0")
+    // LiveData
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
+    // Saved state module for ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version")
+    // Annotation processor
+    kapt("androidx.lifecycle:lifecycle-compiler:$lifecycle_version")
+    // Room
+    implementation("androidx.room:room-runtime:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation("androidx.room:room-ktx:$room_version")
+    //Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version")
+    //Hilt
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0-alpha01")
+    implementation("com.google.dagger:hilt-android:$hilt_version")
+    kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
+    //Retrofit
+    implementation("com.squareup.retrofit2:retrofit:$retrofit_version")
+    implementation("com.squareup.retrofit2:converter-gson:$retrofit_version")
+    // Okhttp
+    implementation("com.squareup.okhttp3:logging-interceptor:$interceptor_version")
+    implementation("com.squareup.okhttp3:okhttp:$interceptor_version")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
