@@ -40,7 +40,7 @@ object ArgumentKeys{
 
 //region ServerConstants
 object ServerConstants{
-//    const val BASE_URL = "http://behsazan.mohammadtazehkar.ir/"
+    const val BASE_URL = "http://behsazan.mohammadtazehkar.ir/"
 //    const val SUB_URL_REGISTER = "api/CustomerApp/AddCustomer"
 
 }
