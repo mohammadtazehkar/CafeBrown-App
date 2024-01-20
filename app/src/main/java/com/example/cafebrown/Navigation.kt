@@ -207,14 +207,18 @@ fun AppNavHost(
                             navController.navigate(DESK_SCREEN)
                         }
 
-                        NAV_RESERVE -> {navController.navigate(RESERVE_HISTORY_SCREEN)}
+                        NAV_RESERVE -> {
+                            navController.navigate(RESERVE_HISTORY_SCREEN)
+                        }
                         NAV_TRANSACTION -> {
                             navController.navigate(TRANSACTION_SCREEN)
                         }
                         NAV_PROFILE -> {
                             navController.navigate("$PROFILE_SCREEN/$HOME_SCREEN")
                         }
-                        NAV_INFO -> {}
+                        NAV_INFO -> {
+                            navController.navigate(ABOUT_US_SCREEN)
+                        }
                     }
 
                 }
