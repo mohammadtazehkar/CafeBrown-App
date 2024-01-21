@@ -40,7 +40,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cafebrown.R
 import com.example.cafebrown.presentation.events.AppUIEvent
 import com.example.cafebrown.presentation.events.LoginEvent
@@ -49,21 +49,28 @@ import com.example.cafebrown.ui.components.AppSnackBar
 import com.example.cafebrown.ui.components.KeyboardHandler
 import com.example.cafebrown.ui.components.MainBox
 import com.example.cafebrown.ui.components.PrimaryButton
+import com.example.cafebrown.ui.components.ProgressBarDialog
 import com.example.cafebrown.ui.components.TextBodyMedium
 import com.example.cafebrown.ui.components.TextTitleLarge
 import com.example.cafebrown.ui.components.TextTitleMedium
 import com.example.cafebrown.utils.AppKeyboard
+import com.example.cafebrown.utils.JSonStatusCode.INTERNET_CONNECTION
+import com.example.cafebrown.utils.JSonStatusCode.SERVER_CONNECTION
+import com.example.cafebrown.utils.Resource
+import com.example.cafebrown.utils.UIText
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LoginScreen(
-    loginViewModel: LoginViewModel = viewModel(),
+    loginViewModel: LoginViewModel = hiltViewModel(),
     onNavigateToVerify: (String) -> Unit
 ) {
 
     val context = LocalContext.current
     val loginState = loginViewModel.loginState.value
     val snackBarHostState = remember { SnackbarHostState() }
+
+
 
     LaunchedEffect(key1 = true) {
         loginViewModel.uiEventFlow.collectLatest { event ->
@@ -76,6 +83,32 @@ fun LoginScreen(
             }
         }
     }
+    LaunchedEffect(key1 = loginState.response) {
+        when (loginState.response) {
+            is Resource.Loading -> {
+                // Display loading UI
+                loginViewModel.onEvent(LoginEvent.UpdateLoading(true))
+
+            }
+            is Resource.Success -> {
+                // Display success UI with data
+                loginViewModel.onEvent(LoginEvent.UpdateLoading(false))
+            }
+            is Resource.Error -> {
+                // Display error UI with message
+                loginViewModel.onEvent(LoginEvent.UpdateLoading(false))
+                when (loginState.response.data?.status) {
+                    INTERNET_CONNECTION -> {
+                        snackBarHostState.showSnackbar(message = UIText.StringResource(R.string.internet_connection_problem).asString(context))
+                    }
+                    SERVER_CONNECTION -> {
+                        snackBarHostState.showSnackbar(message = UIText.StringResource(R.string.connection_problem).asString(context))
+                    }
+                }
+
+            }
+        }
+    }
 
     KeyboardHandler(
         onKeyboardOpen = {
@@ -85,6 +118,14 @@ fun LoginScreen(
             loginViewModel.onEvent(LoginEvent.KeyboardClose)
         }
     )
+
+    if (loginState.isLoading) {
+        ProgressBarDialog(
+            onDismissRequest = {
+                loginViewModel.onEvent(LoginEvent.UpdateLoading(false))
+            }
+        )
+    }
 
     Scaffold(
         snackbarHost = {

@@ -34,31 +34,34 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cafebrown.R
 import com.example.cafebrown.presentation.events.AppUIEvent
-import com.example.cafebrown.presentation.events.LoginEvent
 import com.example.cafebrown.presentation.events.ProfileEvent
 import com.example.cafebrown.presentation.viewmodels.ProfileViewModel
 import com.example.cafebrown.ui.components.AppDatePicker
 import com.example.cafebrown.ui.components.AppSnackBar
 import com.example.cafebrown.ui.components.AppTopAppBar
 import com.example.cafebrown.ui.components.MainBox
-import com.example.cafebrown.ui.components.MainColumn
 import com.example.cafebrown.ui.components.PrimaryButton
+import com.example.cafebrown.ui.components.ProgressBarDialog
 import com.example.cafebrown.ui.components.TextBodyMedium
 import com.example.cafebrown.ui.components.TextTitleSmall
 import com.example.cafebrown.utils.Destinations.VERIFY_SCREEN
+import com.example.cafebrown.utils.JSonStatusCode
+import com.example.cafebrown.utils.Resource
+import com.example.cafebrown.utils.UIText
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun ProfileScreen(
-    profileViewModel: ProfileViewModel = viewModel(),
+    profileViewModel: ProfileViewModel = hiltViewModel(),
     onSignUpCompleted: () -> Unit,
     onNavUp: () -> Unit
 ) {
     val context = LocalContext.current
-    val profileState = profileViewModel.profileState
+    val profileState = profileViewModel.profileState.value
     val errorSnackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
@@ -72,17 +75,51 @@ fun ProfileScreen(
             }
         }
     }
+    LaunchedEffect(key1 = profileState.responseUpdate) {
+        when (profileState.responseUpdate) {
+            is Resource.Loading -> {
+                // Display loading UI
+                profileViewModel.onEvent(ProfileEvent.UpdateLoading(true))
+
+            }
+            is Resource.Success -> {
+                // Display success UI with data
+                profileViewModel.onEvent(ProfileEvent.UpdateLoading(false))
+            }
+            is Resource.Error -> {
+                // Display error UI with message
+                profileViewModel.onEvent(ProfileEvent.UpdateLoading(false))
+                when (profileState.responseUpdate.data?.status) {
+                    JSonStatusCode.INTERNET_CONNECTION -> {
+                        errorSnackBarHostState.showSnackbar(message = UIText.StringResource(R.string.internet_connection_problem).asString(context))
+                    }
+                    JSonStatusCode.SERVER_CONNECTION -> {
+                        errorSnackBarHostState.showSnackbar(message = UIText.StringResource(R.string.connection_problem).asString(context))
+                    }
+                }
+
+            }
+        }
+    }
+
+    if (profileState.isLoading) {
+        ProgressBarDialog(
+            onDismissRequest = {
+                profileViewModel.onEvent(ProfileEvent.UpdateLoading(false))
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
             AppTopAppBar(
                 title =
-                if (profileState.value.from == VERIFY_SCREEN) {
+                if (profileState.from == VERIFY_SCREEN) {
                     stringResource(id = R.string.sign_up)
                 } else {
                     stringResource(id = R.string.profile)
                 },
-                isBackVisible = profileState.value.from != VERIFY_SCREEN,
+                isBackVisible = profileState.from != VERIFY_SCREEN,
                 onBack = onNavUp
             )
         },
@@ -106,7 +143,7 @@ fun ProfileScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                         ProfileTextField(
-                            state = profileState.value.firstName,
+                            state = profileState.firstName,
                             label = stringResource(id = R.string.first_name),
                             leadingIconId = R.mipmap.ic_user_brown,
                             onValueChange = { newVal ->
@@ -115,7 +152,7 @@ fun ProfileScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         ProfileTextField(
-                            state = profileState.value.lastName,
+                            state = profileState.lastName,
                             label = stringResource(id = R.string.last_name),
                             leadingIconId = R.mipmap.ic_user_brown,
                             onValueChange = { newVal ->
@@ -124,7 +161,7 @@ fun ProfileScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         ProfileTextField(
-                            state = profileState.value.mobileNumber,
+                            state = profileState.mobileNumber,
                             label = stringResource(id = R.string.mobile_number),
                             leadingIconId = R.mipmap.ic_mobile_brown,
                             onValueChange = {},
@@ -133,16 +170,16 @@ fun ProfileScreen(
                     }
                     Spacer(modifier = Modifier.height(24.dp))
                     ProfileGenderRow(
-                        gender = profileState.value.gender,
+                        gender = profileState.gender,
                         onGenderClick = { status ->
                             profileViewModel.onEvent(ProfileEvent.UpdateGenderState(status))
                         }
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     ProfileBirthDateRow(
-                        yearList = profileState.value.yearsList,
-                        monthList = profileState.value.monthList,
-                        dayList = profileState.value.daysList,
+                        yearList = profileState.yearsList,
+                        monthList = profileState.monthList,
+                        dayList = profileState.daysList,
                         onSelectedYear = { selected ->
                             profileViewModel.onEvent(ProfileEvent.UpdateSelectedYear(selected))
                         },
@@ -163,19 +200,14 @@ fun ProfileScreen(
                         .padding(16.dp),
                     text = stringResource(
                         id =
-                        if (profileState.value.from == VERIFY_SCREEN) {
+                        if (profileState.from == VERIFY_SCREEN) {
                             R.string.sign_up
                         } else {
                             R.string.submit
                         }
                     ),
-                    onClick = {
-                        if (profileState.value.from == VERIFY_SCREEN) {
-                            profileViewModel.onEvent(ProfileEvent.SignUpClicked(onSignUpCompleted))
-                        } else {
-                            profileViewModel.onEvent(ProfileEvent.UpdateClicked)
-                        }
-                    }
+                    onClick = { profileViewModel.onEvent(ProfileEvent.ActionClicked(onSignUpCompleted,onNavUp))}
+
                 )
             }
         }

@@ -1,6 +1,9 @@
 package com.example.cafebrown.presentation.states
 
+import com.example.cafebrown.data.models.APIGlobalResponse
+import com.example.cafebrown.data.models.verify.APIPostVerificationCodeResponse
 import com.example.cafebrown.utils.AppKeyboard
+import com.example.cafebrown.utils.Resource
 
 
 data class VerifyState(
@@ -15,6 +18,7 @@ data class VerifyState(
     var timeLeft : Long = 0L,
     var actionLabel : String = "",
     var isTimerVisible: Boolean = true,
-    var timer: String = ""
-//    var response : Resource<APISignInResponse>
+    var timer: String = "",
+    var responseVerify : Resource<APIPostVerificationCodeResponse>,
+    var responseMobile : Resource<APIGlobalResponse>
 )

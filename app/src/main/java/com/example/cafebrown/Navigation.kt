@@ -87,6 +87,13 @@ fun AppNavHost(
                             inclusive = true
                         }
                     }
+                },
+                onNavigateToProfile = {
+                    navController.navigate("$PROFILE_SCREEN/$VERIFY_SCREEN") {
+                        popUpTo(SPLASH_SCREEN) {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }
@@ -166,7 +173,17 @@ fun AppNavHost(
                             inclusive = true
                         }
                     }
-                }
+                },
+                onNavigateToHome = {
+                    navController.navigate(HOME_SCREEN) {
+                        popUpTo("$VERIFY_SCREEN/{$MOBILE_NUMBER}") {
+                            inclusive = true
+                        }
+                        popUpTo(LOGIN_SCREEN) {
+                            inclusive = true
+                        }
+                    }
+                },
             )
         }
         composable(

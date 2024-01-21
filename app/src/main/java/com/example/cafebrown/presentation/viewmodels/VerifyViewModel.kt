@@ -7,25 +7,34 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cafebrown.R
+import com.example.cafebrown.domain.usecase.PostMobileUseCase
+import com.example.cafebrown.domain.usecase.PostVerificationCodeUseCase
 import com.example.cafebrown.presentation.events.AppUIEvent
 import com.example.cafebrown.presentation.events.VerifyEvent
 import com.example.cafebrown.presentation.states.VerifyState
 import com.example.cafebrown.utils.AppKeyboard
 import com.example.cafebrown.utils.ArgumentKeys.MOBILE_NUMBER
+import com.example.cafebrown.utils.JSonStatusCode.BAD_REQUEST
+import com.example.cafebrown.utils.JSonStatusCode.SUCCESS
+import com.example.cafebrown.utils.Resource
 import com.example.cafebrown.utils.UIText
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-//@HiltViewModel
-//class SignInViewModel @Inject constructor (private val signInUseCase: SignInUseCase) : ViewModel() {
-class VerifyViewModel(
+@HiltViewModel
+class VerifyViewModel @Inject constructor(
+    private val postVerificationCodeUseCase: PostVerificationCodeUseCase,
+    private val postMobileUseCase: PostMobileUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _verifyState = mutableStateOf(
         VerifyState(
             mobileNumber = savedStateHandle.get<String>(MOBILE_NUMBER)!!,
-//            response = Resource.Error("")
+            responseVerify = Resource.Error(""),
+            responseMobile = Resource.Error("")
         )
     )
     val verifyState: State<VerifyState> = _verifyState
@@ -72,7 +81,7 @@ class VerifyViewModel(
             }
 
             is VerifyEvent.VerifyClicked -> {
-                verify(onVerificationCompleted = event.onNavigateToProfile)
+                verify(onNavigateToProfile = event.onNavigateToProfile, onNavigateToHome = event.onNavigateToHome)
             }
 
             is VerifyEvent.UpdateLoading -> {
@@ -129,15 +138,32 @@ class VerifyViewModel(
     }
 
     private fun verify(
-        onVerificationCompleted: () -> Unit
+        onNavigateToProfile: () -> Unit,
+        onNavigateToHome: () -> Unit
     ) {
         if (verifyState.value.isResendCodeState){
-            startTimer()
             _verifyState.value = verifyState.value.copy(
-                verifyCode = "",
-                isResendCodeState = false,
-                isTimerVisible = true
+                responseMobile = Resource.Loading()
             )
+            viewModelScope.launch {
+                _verifyState.value = verifyState.value.copy(
+                    responseMobile = postMobileUseCase.execute(verifyState.value.mobileNumber)
+                )
+                if (_verifyState.value.responseMobile.data?.status == BAD_REQUEST) {
+                    _uiEventFlow.emit(
+                        AppUIEvent.ShowMessage(
+                            message = UIText.DynamicString(verifyState.value.responseMobile.data?.message!!)
+                        )
+                    )
+                } else if (_verifyState.value.responseMobile.data?.status == SUCCESS) {
+                    startTimer()
+                    _verifyState.value = verifyState.value.copy(
+                        verifyCode = "",
+                        isResendCodeState = false,
+                        isTimerVisible = true
+                    )
+                }
+            }
         }
         else{
             if (verifyState.value.verifyCode.isEmpty()) {
@@ -177,25 +203,30 @@ class VerifyViewModel(
                 }
             }
             else {
-//            _loginState.value = loginState.value.copy(
-//                response = Resource.Loading()
-//            )
-//            viewModelScope.launch {
-//                _loginState.value = loginState.value.copy(
-//                    response = signInUseCase.execute(signInState.value.textFieldStates[USERNAME],signInState.value.textFieldStates[PASSWORD])
-//                )
-//                if (_loginState.value.response.data?.statusCode == INVALID_USERNAME){
-//                    _uiEventFlow.emit(
-//                        SignInUIEvent.ShowMessage(
-//                            message = UIText.StringResource(
-//                                resId = R.string.invalid_login_info,
-//                                _signInState.value.textFieldStates[PASSWORD]
-//                            )
-//                        )
-//                    )
-//                }else if (_signInState.value.response.data?.statusCode == SUCCESS){
-                onVerificationCompleted()
-//                }
+                _verifyState.value = verifyState.value.copy(
+                    responseVerify = Resource.Loading()
+                )
+                viewModelScope.launch {
+                    _verifyState.value = verifyState.value.copy(
+                        responseVerify = postVerificationCodeUseCase.execute(
+                            verifyState.value.mobileNumber,
+                            verifyState.value.verifyCode
+                        )
+                    )
+                    if (_verifyState.value.responseVerify.data?.status == BAD_REQUEST) {
+                        _uiEventFlow.emit(
+                            AppUIEvent.ShowMessage(
+                                message = UIText.DynamicString(verifyState.value.responseVerify.data?.message!!)
+                            )
+                        )
+                    } else if (_verifyState.value.responseVerify.data?.status == SUCCESS) {
+                        if (_verifyState.value.responseVerify.data?.data?.firstName?.isEmpty()!!) {
+                            onNavigateToProfile()
+                        }else{
+                            onNavigateToHome()
+                        }
+                    }
+                }
             }
         }
     }

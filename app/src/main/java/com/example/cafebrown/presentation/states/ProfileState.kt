@@ -1,6 +1,9 @@
 package com.example.cafebrown.presentation.states
 
+import com.example.cafebrown.data.models.APIGlobalResponse
+import com.example.cafebrown.data.models.verify.PostVerificationCodeResponse
 import com.example.cafebrown.utils.AppKeyboard
+import com.example.cafebrown.utils.Resource
 
 
 data class ProfileState(
@@ -17,6 +20,6 @@ data class ProfileState(
     var selectedMonth : String = "1",
     var selectedDay : String = "1320",
     var from : String = "",
-
-//    var response : Resource<APISignInResponse>
+//    var dbInfo: PostVerificationCodeResponse,
+    var responseUpdate : Resource<APIGlobalResponse>
 )

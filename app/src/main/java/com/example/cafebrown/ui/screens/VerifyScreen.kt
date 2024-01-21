@@ -44,6 +44,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cafebrown.R
 import com.example.cafebrown.presentation.events.AppUIEvent
@@ -53,20 +54,23 @@ import com.example.cafebrown.ui.components.AppSnackBar
 import com.example.cafebrown.ui.components.KeyboardHandler
 import com.example.cafebrown.ui.components.MainBox
 import com.example.cafebrown.ui.components.PrimaryButton
-import com.example.cafebrown.ui.components.SecondaryButton
+import com.example.cafebrown.ui.components.ProgressBarDialog
 import com.example.cafebrown.ui.components.TextBodyMedium
 import com.example.cafebrown.ui.components.TextTitleMedium
 import com.example.cafebrown.ui.components.TextTitleSmall
 import com.example.cafebrown.ui.components.TextTitleSmallPrimary
 import com.example.cafebrown.utils.AppKeyboard
+import com.example.cafebrown.utils.JSonStatusCode
+import com.example.cafebrown.utils.Resource
 import com.example.cafebrown.utils.UIText
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun VerifyScreen(
-    verifyViewModel : VerifyViewModel = viewModel(),
-    onNavigateToProfile : () -> Unit
+    verifyViewModel : VerifyViewModel = hiltViewModel(),
+    onNavigateToProfile : () -> Unit,
+    onNavigateToHome : () -> Unit,
 ){
     val context = LocalContext.current
     val verifyState = verifyViewModel.verifyState.value
@@ -83,6 +87,67 @@ fun VerifyScreen(
             }
         }
     }
+    LaunchedEffect(key1 = verifyState.responseVerify) {
+        when (verifyState.responseVerify) {
+            is Resource.Loading -> {
+                // Display loading UI
+                verifyViewModel.onEvent(VerifyEvent.UpdateLoading(true))
+
+            }
+            is Resource.Success -> {
+                // Display success UI with data
+                verifyViewModel.onEvent(VerifyEvent.UpdateLoading(false))
+            }
+            is Resource.Error -> {
+                // Display error UI with message
+                verifyViewModel.onEvent(VerifyEvent.UpdateLoading(false))
+                when (verifyState.responseVerify.data?.status) {
+                    JSonStatusCode.INTERNET_CONNECTION -> {
+                        snackBarHostState.showSnackbar(message = UIText.StringResource(R.string.internet_connection_problem).asString(context))
+                    }
+                    JSonStatusCode.SERVER_CONNECTION -> {
+                        snackBarHostState.showSnackbar(message = UIText.StringResource(R.string.connection_problem).asString(context))
+                    }
+                }
+
+            }
+        }
+    }
+    LaunchedEffect(key1 = verifyState.responseMobile) {
+        when (verifyState.responseMobile) {
+            is Resource.Loading -> {
+                // Display loading UI
+                verifyViewModel.onEvent(VerifyEvent.UpdateLoading(true))
+
+            }
+            is Resource.Success -> {
+                // Display success UI with data
+                verifyViewModel.onEvent(VerifyEvent.UpdateLoading(false))
+            }
+            is Resource.Error -> {
+                // Display error UI with message
+                verifyViewModel.onEvent(VerifyEvent.UpdateLoading(false))
+                when (verifyState.responseMobile.data?.status) {
+                    JSonStatusCode.INTERNET_CONNECTION -> {
+                        snackBarHostState.showSnackbar(message = UIText.StringResource(R.string.internet_connection_problem).asString(context))
+                    }
+                    JSonStatusCode.SERVER_CONNECTION -> {
+                        snackBarHostState.showSnackbar(message = UIText.StringResource(R.string.connection_problem).asString(context))
+                    }
+                }
+
+            }
+        }
+    }
+    LaunchedEffect(key1 = verifyState.timeLeft ){
+        delay(1000)
+        if (verifyState.timeLeft == 0L) {
+            verifyViewModel.onEvent(VerifyEvent.UpdateResendCodeState(true))
+            verifyViewModel.onEvent(VerifyEvent.UpdateActionLabel(UIText.StringResource(R.string.receive_again_code).asString(context)))
+        }else{
+            verifyViewModel.onEvent(VerifyEvent.UpdateTimeLeft)
+        }
+    }
 
     if (verifyState.isRulesDialogVisible) {
         RulesDialog(
@@ -91,6 +156,13 @@ fun VerifyScreen(
             },
             onConfirmation = {
                 verifyViewModel.onEvent(VerifyEvent.UpdateRulesDialogVisibility(false))
+            }
+        )
+    }
+    if (verifyState.isLoading) {
+        ProgressBarDialog(
+            onDismissRequest = {
+                verifyViewModel.onEvent(VerifyEvent.UpdateLoading(false))
             }
         )
     }
@@ -103,16 +175,6 @@ fun VerifyScreen(
             verifyViewModel.onEvent(VerifyEvent.KeyboardClose)
         }
     )
-
-    LaunchedEffect(key1 = verifyState.timeLeft ){
-        delay(1000)
-        if (verifyState.timeLeft == 0L) {
-            verifyViewModel.onEvent(VerifyEvent.UpdateResendCodeState(true))
-            verifyViewModel.onEvent(VerifyEvent.UpdateActionLabel(UIText.StringResource(R.string.receive_again_code).asString(context)))
-        }else{
-            verifyViewModel.onEvent(VerifyEvent.UpdateTimeLeft)
-        }
-    }
 
     Scaffold(
         snackbarHost = {
@@ -143,7 +205,7 @@ fun VerifyScreen(
                             verifyViewModel.onEvent(VerifyEvent.UpdateVerifyCodeState(newValue,UIText.StringResource(R.string.login).asString(context)))
                         },
                         onSend = {
-                            verifyViewModel.onEvent(VerifyEvent.VerifyClicked(onNavigateToProfile = onNavigateToProfile))
+                            verifyViewModel.onEvent(VerifyEvent.VerifyClicked(onNavigateToProfile = onNavigateToProfile, onNavigateToHome = onNavigateToHome))
                         },
                         onMakeVerifyCodeEmpty = {
                             verifyViewModel.onEvent(VerifyEvent.MakeVerifyCodeEmpty)
@@ -165,7 +227,7 @@ fun VerifyScreen(
                     secondText = verifyState.actionLabel ,
                     status = verifyState.isTimerVisible,
                     onClick = {
-                        verifyViewModel.onEvent(VerifyEvent.VerifyClicked(onNavigateToProfile = onNavigateToProfile))
+                        verifyViewModel.onEvent(VerifyEvent.VerifyClicked(onNavigateToProfile = onNavigateToProfile, onNavigateToHome = onNavigateToHome))
                     })
 
             }

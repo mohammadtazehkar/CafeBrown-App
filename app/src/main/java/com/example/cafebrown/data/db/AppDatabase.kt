@@ -2,7 +2,7 @@ package com.example.cafebrown.data.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.cafebrown.data.models.PostVerificationCodeResponse
+import com.example.cafebrown.data.models.verify.PostVerificationCodeResponse
 
 @Database(
     entities = [PostVerificationCodeResponse::class],

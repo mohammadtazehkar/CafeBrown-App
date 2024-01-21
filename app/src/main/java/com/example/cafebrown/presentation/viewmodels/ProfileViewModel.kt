@@ -1,24 +1,34 @@
 package com.example.cafebrown.presentation.viewmodels
 
-import android.text.format.DateUtils
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cafebrown.R
+import com.example.cafebrown.data.models.profile.APIUpdateProfileRequest
+import com.example.cafebrown.data.models.verify.PostVerificationCodeResponse
+import com.example.cafebrown.domain.usecase.GetProfileDataUseCase
+import com.example.cafebrown.domain.usecase.UpdateProfileDataUseCase
 import com.example.cafebrown.presentation.events.AppUIEvent
 import com.example.cafebrown.presentation.events.ProfileEvent
 import com.example.cafebrown.presentation.states.ProfileState
 import com.example.cafebrown.utils.ArgumentKeys.FROM
+import com.example.cafebrown.utils.Destinations.VERIFY_SCREEN
+import com.example.cafebrown.utils.JSonStatusCode
+import com.example.cafebrown.utils.Resource
 import com.example.cafebrown.utils.UIText
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-//@HiltViewModel
-//class SignInViewModel @Inject constructor (private val signInUseCase: SignInUseCase) : ViewModel() {
-class ProfileViewModel(
+@HiltViewModel
+class ProfileViewModel @Inject constructor (
+    private val getProfileDataUseCase: GetProfileDataUseCase,
+    private val updateProfileDataUseCase: UpdateProfileDataUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _profileState = mutableStateOf(
@@ -26,8 +36,9 @@ class ProfileViewModel(
             yearsList = (1320..1402).map { it.toString() },
             monthList = (1..12).map { it.toString() },
             daysList = (1..31).map { it.toString() },
-            from = savedStateHandle.get<String>(FROM)!!
-//            response = Resource.Error("")
+            from = savedStateHandle.get<String>(FROM)!!,
+//            dbInfo = PostVerificationCodeResponse(0,"","","",true,"",""),
+            responseUpdate = Resource.Error("")
         )
     )
     val profileState: State<ProfileState> = _profileState
@@ -35,15 +46,13 @@ class ProfileViewModel(
     private val _uiEventFlow = MutableSharedFlow<AppUIEvent>()
     val uiEventFlow = _uiEventFlow.asSharedFlow()
 
+    init {
+        setData()
+    }
     fun onEvent(event: ProfileEvent) {
         when (event) {
-            is ProfileEvent.GetProfileData -> TODO()
-            is ProfileEvent.PrepareData -> TODO()
-            is ProfileEvent.UpdateClicked -> {
-                updateProfile()
-            }
-            is ProfileEvent.SignUpClicked -> {
-                signUp(event.onSignUpCompleted)
+            is ProfileEvent.ActionClicked -> {
+                signUp(event.onSignUpCompleted,event.onUpdateCompleted)
             }
             is ProfileEvent.UpdateFirstNameState -> {
                 _profileState.value = profileState.value.copy(
@@ -60,7 +69,11 @@ class ProfileViewModel(
                     gender = event.status
                 )
             }
-            is ProfileEvent.UpdateLoading -> TODO()
+            is ProfileEvent.UpdateLoading -> {
+                _profileState.value = profileState.value.copy(
+                    isLoading = event.status
+                )
+            }
             is ProfileEvent.UpdateSelectedDay -> {
                 _profileState.value = profileState.value.copy(
                     selectedDay = event.newValue
@@ -80,6 +93,27 @@ class ProfileViewModel(
             }
 
         }
+    }
+
+    private fun setData(){
+
+        viewModelScope.launch {
+            val dbInfo = getProfileDataUseCase.execute()
+            val dbBirthDate = dbInfo.birthDate
+            _profileState.value = profileState.value.copy(
+                firstName = dbInfo.firstName,
+                lastName = dbInfo.lastName,
+                mobileNumber = dbInfo.mobile,
+                gender =dbInfo.sex,
+                selectedYear = if (!dbBirthDate.isNullOrEmpty()){ dbBirthDate.split("/")[2] }else{ "1320" },
+                selectedMonth = if (!dbBirthDate.isNullOrEmpty()){ dbBirthDate.split("/")[1] }else{ "1" },
+                selectedDay = if (!dbBirthDate.isNullOrEmpty()){ dbBirthDate.split("/")[0] }else{ "1" }
+            )
+        }
+        Log.i("mamali",profileState.value.selectedDay)
+
+
+        checkLeapYear(profileState.value.selectedYear.toInt())
     }
 
     private fun checkLeapYear(newYear : Int){
@@ -113,33 +147,39 @@ class ProfileViewModel(
             }
         }
     }
-
-    private fun updateProfile() {
-        if (isValidInputs()) {
-
-        }
-    }
-    private fun signUp(onSignUpCompleted: () -> Unit){
+    private fun signUp(
+        onSignUpCompleted: () -> Unit,
+        onUpdateCompleted: () -> Unit
+    ){
         if (isValidInputs()){
-//            _loginState.value = loginState.value.copy(
-//                response = Resource.Loading()
-//            )
-//            viewModelScope.launch {
-//                _loginState.value = loginState.value.copy(
-//                    response = signInUseCase.execute(signInState.value.textFieldStates[USERNAME],signInState.value.textFieldStates[PASSWORD])
-//                )
-//                if (_loginState.value.response.data?.statusCode == INVALID_USERNAME){
-//                    _uiEventFlow.emit(
-//                        SignInUIEvent.ShowMessage(
-//                            message = UIText.StringResource(
-//                                resId = R.string.invalid_login_info,
-//                                _signInState.value.textFieldStates[PASSWORD]
-//                            )
-//                        )
-//                    )
-//                }else if (_signInState.value.response.data?.statusCode == SUCCESS){
-//                }
-            onSignUpCompleted()
+            _profileState.value = profileState.value.copy(
+                responseUpdate = Resource.Loading()
+            )
+            viewModelScope.launch {
+                _profileState.value = profileState.value.copy(
+                    responseUpdate = updateProfileDataUseCase.execute(
+                        APIUpdateProfileRequest(
+                            profileState.value.firstName,
+                            profileState.value.lastName,
+                            profileState.value.selectedYear+"/"+profileState.value.selectedMonth+"/"+profileState.value.selectedDay,
+                            profileState.value.gender,
+                        )
+                    )
+                )
+                if (_profileState.value.responseUpdate.data?.status == JSonStatusCode.BAD_REQUEST) {
+                    _uiEventFlow.emit(
+                        AppUIEvent.ShowMessage(
+                            message = UIText.DynamicString(profileState.value.responseUpdate.data?.message!!)
+                        )
+                    )
+                } else if (_profileState.value.responseUpdate.data?.status == JSonStatusCode.SUCCESS) {
+                    if (profileState.value.from == VERIFY_SCREEN){
+                        onSignUpCompleted()
+                    }else{
+                        onUpdateCompleted()
+                    }
+                }
+            }
         }
 
     }

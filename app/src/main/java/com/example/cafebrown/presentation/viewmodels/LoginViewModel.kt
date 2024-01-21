@@ -5,21 +5,28 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cafebrown.R
+import com.example.cafebrown.domain.usecase.PostMobileUseCase
 import com.example.cafebrown.presentation.events.AppUIEvent
 import com.example.cafebrown.presentation.events.LoginEvent
 import com.example.cafebrown.presentation.states.LoginState
 import com.example.cafebrown.utils.AppKeyboard
+import com.example.cafebrown.utils.JSonStatusCode.BAD_REQUEST
+import com.example.cafebrown.utils.JSonStatusCode.SUCCESS
+import com.example.cafebrown.utils.Resource
 import com.example.cafebrown.utils.UIText
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-//@HiltViewModel
+
 //class SignInViewModel @Inject constructor (private val signInUseCase: SignInUseCase) : ViewModel() {
-class LoginViewModel : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor (private val postMobileUseCase: PostMobileUseCase): ViewModel() {
     private val _loginState = mutableStateOf(
         LoginState(
-//            response = Resource.Error("")
+            response = Resource.Error("")
         )
     )
     val loginState: State<LoginState> = _loginState
@@ -101,25 +108,23 @@ class LoginViewModel : ViewModel() {
             }
         }
         else {
-//            _loginState.value = loginState.value.copy(
-//                response = Resource.Loading()
-//            )
-//            viewModelScope.launch {
-//                _loginState.value = loginState.value.copy(
-//                    response = signInUseCase.execute(signInState.value.textFieldStates[USERNAME],signInState.value.textFieldStates[PASSWORD])
-//                )
-//                if (_loginState.value.response.data?.statusCode == INVALID_USERNAME){
-//                    _uiEventFlow.emit(
-//                        SignInUIEvent.ShowMessage(
-//                            message = UIText.StringResource(
-//                                resId = R.string.invalid_login_info,
-//                                _signInState.value.textFieldStates[PASSWORD]
-//                            )
-//                        )
-//                    )
-//                }else if (_signInState.value.response.data?.statusCode == SUCCESS){
+            _loginState.value = loginState.value.copy(
+                response = Resource.Loading()
+            )
+            viewModelScope.launch {
+                _loginState.value = loginState.value.copy(
+                    response = postMobileUseCase.execute("0${loginState.value.mobileNumber}")
+                )
+                if (loginState.value.response.data?.status == BAD_REQUEST){
+                    _uiEventFlow.emit(
+                        AppUIEvent.ShowMessage(
+                            message = UIText.DynamicString(loginState.value.response.data?.message!!)
+                        )
+                    )
+                }else if (loginState.value.response.data?.status == SUCCESS) {
                     onLoginCompleted("0${loginState.value.mobileNumber}")
-//                }
+                }
+            }
         }
     }
 }

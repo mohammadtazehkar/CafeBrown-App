@@ -1,4 +1,4 @@
-package com.example.cafebrown.data.models
+package com.example.cafebrown.data.models.verify
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -10,14 +10,13 @@ import com.google.gson.annotations.SerializedName
 )
 data class PostVerificationCodeResponse(
     @PrimaryKey(autoGenerate = false)
-    @ColumnInfo(name = "userId")
     val id: Int,
     @SerializedName("name")
     val firstName: String,
     @SerializedName("family")
     val lastName: String,
     @SerializedName("birthDate")
-    val birthDate: String,
+    val birthDate: String?,
     @SerializedName("sex")
     val sex: Boolean,
     @SerializedName("mobile")
