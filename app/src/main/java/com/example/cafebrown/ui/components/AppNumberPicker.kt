@@ -1,5 +1,6 @@
 package com.example.cafebrown.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Box
@@ -95,6 +96,9 @@ fun AppNumberPicker(
             modifier = Modifier.offset(y = itemHeightDp * (visibleItemsMiddle + 1)).width(width)
         )
 
+    }
+    LaunchedEffect(startIndex) {
+        listState.scrollToItem(index = if (startIndex == 0){0}else{startIndex-1})
     }
 
 }

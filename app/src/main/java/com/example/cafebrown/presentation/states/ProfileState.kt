@@ -19,7 +19,9 @@ data class ProfileState(
     var selectedYear : String = "1",
     var selectedMonth : String = "1",
     var selectedDay : String = "1320",
+    var selectedYearIndex : Int = 0,
+    var selectedMonthIndex : Int = 0,
+    var selectedDayIndex : Int = 0,
     var from : String = "",
-//    var dbInfo: PostVerificationCodeResponse,
     var responseUpdate : Resource<APIGlobalResponse>
 )

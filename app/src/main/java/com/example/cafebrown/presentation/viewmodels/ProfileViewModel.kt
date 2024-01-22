@@ -37,7 +37,6 @@ class ProfileViewModel @Inject constructor (
             monthList = (1..12).map { it.toString() },
             daysList = (1..31).map { it.toString() },
             from = savedStateHandle.get<String>(FROM)!!,
-//            dbInfo = PostVerificationCodeResponse(0,"","","",true,"",""),
             responseUpdate = Resource.Error("")
         )
     )
@@ -100,17 +99,23 @@ class ProfileViewModel @Inject constructor (
         viewModelScope.launch {
             val dbInfo = getProfileDataUseCase.execute()
             val dbBirthDate = dbInfo.birthDate
+            val selectedY = if (!dbBirthDate.isNullOrEmpty()){ dbBirthDate.split("/")[0] }else{ "1320" }
+            val selectedM = if (!dbBirthDate.isNullOrEmpty()){ dbBirthDate.split("/")[1] }else{ "1" }
+            val selectedD = if (!dbBirthDate.isNullOrEmpty()){ dbBirthDate.split("/")[2] }else{ "1" }
+
             _profileState.value = profileState.value.copy(
                 firstName = dbInfo.firstName,
                 lastName = dbInfo.lastName,
                 mobileNumber = dbInfo.mobile,
                 gender =dbInfo.sex,
-                selectedYear = if (!dbBirthDate.isNullOrEmpty()){ dbBirthDate.split("/")[2] }else{ "1320" },
-                selectedMonth = if (!dbBirthDate.isNullOrEmpty()){ dbBirthDate.split("/")[1] }else{ "1" },
-                selectedDay = if (!dbBirthDate.isNullOrEmpty()){ dbBirthDate.split("/")[0] }else{ "1" }
+                selectedYear = selectedY,
+                selectedMonth = selectedM,
+                selectedDay = selectedD,
+                selectedYearIndex = profileState.value.yearsList.indexOf(selectedY),
+                selectedMonthIndex = profileState.value.monthList.indexOf(selectedM),
+                selectedDayIndex = profileState.value.daysList.indexOf(selectedD)
             )
         }
-        Log.i("mamali",profileState.value.selectedDay)
 
 
         checkLeapYear(profileState.value.selectedYear.toInt())
