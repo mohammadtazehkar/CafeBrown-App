@@ -84,58 +84,7 @@ fun VerifyScreen(
                         message = event.message.asString(context)
                     )
                 }
-            }
-        }
-    }
-    LaunchedEffect(key1 = verifyState.responseVerify) {
-        when (verifyState.responseVerify) {
-            is Resource.Loading -> {
-                // Display loading UI
-                verifyViewModel.onEvent(VerifyEvent.UpdateLoading(true))
-
-            }
-            is Resource.Success -> {
-                // Display success UI with data
-                verifyViewModel.onEvent(VerifyEvent.UpdateLoading(false))
-            }
-            is Resource.Error -> {
-                // Display error UI with message
-                verifyViewModel.onEvent(VerifyEvent.UpdateLoading(false))
-                when (verifyState.responseVerify.data?.status) {
-                    JSonStatusCode.INTERNET_CONNECTION -> {
-                        snackBarHostState.showSnackbar(message = UIText.StringResource(R.string.internet_connection_problem).asString(context))
-                    }
-                    JSonStatusCode.SERVER_CONNECTION -> {
-                        snackBarHostState.showSnackbar(message = UIText.StringResource(R.string.connection_problem).asString(context))
-                    }
-                }
-
-            }
-        }
-    }
-    LaunchedEffect(key1 = verifyState.responseMobile) {
-        when (verifyState.responseMobile) {
-            is Resource.Loading -> {
-                // Display loading UI
-                verifyViewModel.onEvent(VerifyEvent.UpdateLoading(true))
-
-            }
-            is Resource.Success -> {
-                // Display success UI with data
-                verifyViewModel.onEvent(VerifyEvent.UpdateLoading(false))
-            }
-            is Resource.Error -> {
-                // Display error UI with message
-                verifyViewModel.onEvent(VerifyEvent.UpdateLoading(false))
-                when (verifyState.responseMobile.data?.status) {
-                    JSonStatusCode.INTERNET_CONNECTION -> {
-                        snackBarHostState.showSnackbar(message = UIText.StringResource(R.string.internet_connection_problem).asString(context))
-                    }
-                    JSonStatusCode.SERVER_CONNECTION -> {
-                        snackBarHostState.showSnackbar(message = UIText.StringResource(R.string.connection_problem).asString(context))
-                    }
-                }
-
+                else -> {}
             }
         }
     }
@@ -159,13 +108,7 @@ fun VerifyScreen(
             }
         )
     }
-    if (verifyState.isLoading) {
-        ProgressBarDialog(
-            onDismissRequest = {
-                verifyViewModel.onEvent(VerifyEvent.UpdateLoading(false))
-            }
-        )
-    }
+    if (verifyState.isLoading) { ProgressBarDialog() }
 
     KeyboardHandler(
         onKeyboardOpen = {

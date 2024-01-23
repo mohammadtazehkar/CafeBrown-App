@@ -77,6 +77,8 @@ fun ProductListScreen(
                         message = event.message.asString(context)
                     )
                 }
+
+                else -> {}
             }
         }
     }

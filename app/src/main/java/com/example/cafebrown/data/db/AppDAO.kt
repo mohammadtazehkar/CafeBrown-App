@@ -27,4 +27,7 @@ interface AppDAO {
     @Query("SELECT mobile FROM userInfo")
     suspend fun getUserMobile(): String
 
+    @Query("DELETE FROM userInfo")
+    suspend fun deleteUserInfo()
+
 }

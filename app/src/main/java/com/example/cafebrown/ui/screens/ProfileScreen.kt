@@ -53,12 +53,14 @@ import com.example.cafebrown.utils.Destinations.VERIFY_SCREEN
 import com.example.cafebrown.utils.JSonStatusCode
 import com.example.cafebrown.utils.Resource
 import com.example.cafebrown.utils.UIText
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun ProfileScreen(
     profileViewModel: ProfileViewModel = hiltViewModel(),
     onSignUpCompleted: () -> Unit,
+    onExpiredToken: () -> Unit,
     onNavUp: () -> Unit
 ) {
     val context = LocalContext.current
@@ -73,43 +75,20 @@ fun ProfileScreen(
                         message = event.message.asString(context)
                     )
                 }
-            }
-        }
-    }
-    LaunchedEffect(key1 = profileState.responseUpdate) {
-        when (profileState.responseUpdate) {
-            is Resource.Loading -> {
-                // Display loading UI
-                profileViewModel.onEvent(ProfileEvent.UpdateLoading(true))
 
-            }
-            is Resource.Success -> {
-                // Display success UI with data
-                profileViewModel.onEvent(ProfileEvent.UpdateLoading(false))
-            }
-            is Resource.Error -> {
-                // Display error UI with message
-                profileViewModel.onEvent(ProfileEvent.UpdateLoading(false))
-                when (profileState.responseUpdate.data?.status) {
-                    JSonStatusCode.INTERNET_CONNECTION -> {
-                        errorSnackBarHostState.showSnackbar(message = UIText.StringResource(R.string.internet_connection_problem).asString(context))
-                    }
-                    JSonStatusCode.SERVER_CONNECTION -> {
-                        errorSnackBarHostState.showSnackbar(message = UIText.StringResource(R.string.connection_problem).asString(context))
-                    }
+                is AppUIEvent.ExpiredToken -> {
+                    errorSnackBarHostState.showSnackbar(
+                        message = UIText.StringResource(R.string.expired_token)
+                            .asString(context)
+                    )
+                    delay(500)  // the delay of 0.5 seconds
+                    onExpiredToken()
                 }
-
             }
         }
     }
 
-    if (profileState.isLoading) {
-        ProgressBarDialog(
-            onDismissRequest = {
-                profileViewModel.onEvent(ProfileEvent.UpdateLoading(false))
-            }
-        )
-    }
+    if (profileState.isLoading) { ProgressBarDialog()}
 
     Scaffold(
         topBar = {

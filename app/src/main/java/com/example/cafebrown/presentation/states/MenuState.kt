@@ -1,11 +1,13 @@
 package com.example.cafebrown.presentation.states
 
-import com.example.cafebrown.ui.screens.MenuItemData
+import com.example.cafebrown.data.models.menu.APIGetMenuResponse
+import com.example.cafebrown.data.models.menu.GetMenuResponse
+import com.example.cafebrown.utils.Resource
 
 
 data class MenuState(
-    var isLoading : Boolean = true,
-    var menuListState : List<MenuItemData> = mutableListOf(),
-    var from : String
-//    var response: Resource<APIHomeDataResponse>
+    var isLoading : Boolean = false,
+    var menuListState : List<GetMenuResponse> = emptyList(),
+    var from : String,
+    var response: Resource<APIGetMenuResponse>
 )

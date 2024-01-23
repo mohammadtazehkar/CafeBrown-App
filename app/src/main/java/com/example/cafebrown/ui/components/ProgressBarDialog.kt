@@ -14,11 +14,9 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cafebrown.R
 
 @Composable
-fun ProgressBarDialog(
-    onDismissRequest: () -> Unit,
-){
+fun ProgressBarDialog(){
     Dialog(
-        onDismissRequest = { onDismissRequest() },
+        onDismissRequest = {},
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
     ) {
         val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.animation_progress))

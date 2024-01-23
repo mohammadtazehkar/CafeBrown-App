@@ -40,4 +40,8 @@ class AppLocalDataSourceImpl(
         return appDAO.getUserMobile()
     }
 
+    override suspend fun deleteUserInfo() {
+        appDAO.deleteUserInfo()
+    }
+
 }

@@ -9,5 +9,6 @@ interface AppLocalDataSource {
     suspend fun checkUserData(): Int
     suspend fun getTokenFromDB(): String
     suspend fun getMobileFromDB(): String
+    suspend fun deleteUserInfo()
 
 }

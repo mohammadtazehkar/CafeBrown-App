@@ -17,6 +17,11 @@ import com.example.cafebrown.presentation.states.ProfileState
 import com.example.cafebrown.utils.ArgumentKeys.FROM
 import com.example.cafebrown.utils.Destinations.VERIFY_SCREEN
 import com.example.cafebrown.utils.JSonStatusCode
+import com.example.cafebrown.utils.JSonStatusCode.BAD_REQUEST
+import com.example.cafebrown.utils.JSonStatusCode.EXPIRED_TOKEN
+import com.example.cafebrown.utils.JSonStatusCode.INTERNET_CONNECTION
+import com.example.cafebrown.utils.JSonStatusCode.SERVER_CONNECTION
+import com.example.cafebrown.utils.JSonStatusCode.SUCCESS
 import com.example.cafebrown.utils.Resource
 import com.example.cafebrown.utils.UIText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -68,11 +73,6 @@ class ProfileViewModel @Inject constructor (
                     gender = event.status
                 )
             }
-            is ProfileEvent.UpdateLoading -> {
-                _profileState.value = profileState.value.copy(
-                    isLoading = event.status
-                )
-            }
             is ProfileEvent.UpdateSelectedDay -> {
                 _profileState.value = profileState.value.copy(
                     selectedDay = event.newValue
@@ -117,7 +117,6 @@ class ProfileViewModel @Inject constructor (
             )
         }
 
-
         checkLeapYear(profileState.value.selectedYear.toInt())
     }
 
@@ -158,6 +157,7 @@ class ProfileViewModel @Inject constructor (
     ){
         if (isValidInputs()){
             _profileState.value = profileState.value.copy(
+                isLoading = true,
                 responseUpdate = Resource.Loading()
             )
             viewModelScope.launch {
@@ -171,19 +171,44 @@ class ProfileViewModel @Inject constructor (
                         )
                     )
                 )
-                if (_profileState.value.responseUpdate.data?.status == JSonStatusCode.BAD_REQUEST) {
-                    _uiEventFlow.emit(
-                        AppUIEvent.ShowMessage(
-                            message = UIText.DynamicString(profileState.value.responseUpdate.data?.message!!)
+                when(profileState.value.responseUpdate.data?.status){
+                    BAD_REQUEST -> {
+                        _uiEventFlow.emit(
+                            AppUIEvent.ShowMessage(
+                                message = UIText.DynamicString(profileState.value.responseUpdate.data?.message!!)
+                            )
                         )
-                    )
-                } else if (_profileState.value.responseUpdate.data?.status == JSonStatusCode.SUCCESS) {
-                    if (profileState.value.from == VERIFY_SCREEN){
-                        onSignUpCompleted()
-                    }else{
-                        onUpdateCompleted()
+                    }
+                    SUCCESS -> {
+                        if (profileState.value.from == VERIFY_SCREEN){
+                            onSignUpCompleted()
+                        }else{
+                            onUpdateCompleted()
+                        }
+                    }
+                    SERVER_CONNECTION ->{
+                        _uiEventFlow.emit(
+                            AppUIEvent.ShowMessage(
+                                message = UIText.StringResource(R.string.connection_problem)
+                            )
+                        )
+                    }
+                    INTERNET_CONNECTION ->{
+                        _uiEventFlow.emit(
+                            AppUIEvent.ShowMessage(
+                                message = UIText.StringResource(R.string.internet_connection_problem)
+                            )
+                        )
+                    }
+                    EXPIRED_TOKEN -> {
+                        _uiEventFlow.emit(
+                            AppUIEvent.ExpiredToken
+                        )
                     }
                 }
+                _profileState.value = profileState.value.copy(
+                    isLoading = false
+                )
             }
         }
 

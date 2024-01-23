@@ -6,5 +6,5 @@ sealed class LoginEvent{
     data class UpdateMobileState(val newValue: String): LoginEvent()
     data object MakeMobileEmpty: LoginEvent()
     data class LoginClicked(val onNavigateToVerify: (String) -> Unit) : LoginEvent()
-    data class UpdateLoading(val status: Boolean) : LoginEvent()
+//    data class UpdateLoading(val status: Boolean) : LoginEvent()
 }

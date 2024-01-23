@@ -43,7 +43,6 @@ fun AppNavHost(
     NavHost(
         navController = navController,
         startDestination = SPLASH_SCREEN,
-//        startDestination = MENU_LIST_SCREEN,
     ) {
 
         composable(
@@ -282,7 +281,17 @@ fun AppNavHost(
                         }
                     }
                 },
-                onNavUp = navController::navigateUp
+                onNavUp = navController::navigateUp,
+                onExpiredToken = {
+                    navController.navigate(SPLASH_SCREEN){
+                        popUpTo("$PROFILE_SCREEN/{$FROM}") {
+                            inclusive = true
+                        }
+                        popUpTo(HOME_SCREEN) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
 
@@ -323,7 +332,17 @@ fun AppNavHost(
                 onNavigateToProductList = { categoryId, from ->
                     navController.navigate("$PRODUCT_LIST_SCREEN/$categoryId/$from")
                 },
-                onNavUp = navController::navigateUp
+                onNavUp = navController::navigateUp,
+                onExpiredToken = {
+                    navController.navigate(SPLASH_SCREEN){
+                        popUpTo("$MENU_LIST_SCREEN/{$FROM}") {
+                            inclusive = true
+                        }
+                        popUpTo(HOME_SCREEN) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
 

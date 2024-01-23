@@ -80,32 +80,7 @@ fun LoginScreen(
                         message = event.message.asString(context)
                     )
                 }
-            }
-        }
-    }
-    LaunchedEffect(key1 = loginState.response) {
-        when (loginState.response) {
-            is Resource.Loading -> {
-                // Display loading UI
-                loginViewModel.onEvent(LoginEvent.UpdateLoading(true))
-
-            }
-            is Resource.Success -> {
-                // Display success UI with data
-                loginViewModel.onEvent(LoginEvent.UpdateLoading(false))
-            }
-            is Resource.Error -> {
-                // Display error UI with message
-                loginViewModel.onEvent(LoginEvent.UpdateLoading(false))
-                when (loginState.response.data?.status) {
-                    INTERNET_CONNECTION -> {
-                        snackBarHostState.showSnackbar(message = UIText.StringResource(R.string.internet_connection_problem).asString(context))
-                    }
-                    SERVER_CONNECTION -> {
-                        snackBarHostState.showSnackbar(message = UIText.StringResource(R.string.connection_problem).asString(context))
-                    }
-                }
-
+                else -> {}
             }
         }
     }
@@ -120,11 +95,7 @@ fun LoginScreen(
     )
 
     if (loginState.isLoading) {
-        ProgressBarDialog(
-            onDismissRequest = {
-                loginViewModel.onEvent(LoginEvent.UpdateLoading(false))
-            }
-        )
+        ProgressBarDialog()
     }
 
     Scaffold(

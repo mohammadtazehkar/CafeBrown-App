@@ -10,7 +10,10 @@ import com.example.cafebrown.presentation.events.AppUIEvent
 import com.example.cafebrown.presentation.events.LoginEvent
 import com.example.cafebrown.presentation.states.LoginState
 import com.example.cafebrown.utils.AppKeyboard
+import com.example.cafebrown.utils.JSonStatusCode
 import com.example.cafebrown.utils.JSonStatusCode.BAD_REQUEST
+import com.example.cafebrown.utils.JSonStatusCode.INTERNET_CONNECTION
+import com.example.cafebrown.utils.JSonStatusCode.SERVER_CONNECTION
 import com.example.cafebrown.utils.JSonStatusCode.SUCCESS
 import com.example.cafebrown.utils.Resource
 import com.example.cafebrown.utils.UIText
@@ -60,11 +63,6 @@ class LoginViewModel @Inject constructor (private val postMobileUseCase: PostMob
             is LoginEvent.LoginClicked -> {
                 login(onLoginCompleted = event.onNavigateToVerify)
             }
-            is LoginEvent.UpdateLoading -> {
-                _loginState.value = loginState.value.copy(
-                    isLoading = event.status
-                )
-            }
         }
     }
 
@@ -109,21 +107,42 @@ class LoginViewModel @Inject constructor (private val postMobileUseCase: PostMob
         }
         else {
             _loginState.value = loginState.value.copy(
+                isLoading = true,
                 response = Resource.Loading()
             )
             viewModelScope.launch {
                 _loginState.value = loginState.value.copy(
                     response = postMobileUseCase.execute("0${loginState.value.mobileNumber}")
                 )
-                if (loginState.value.response.data?.status == BAD_REQUEST){
-                    _uiEventFlow.emit(
-                        AppUIEvent.ShowMessage(
-                            message = UIText.DynamicString(loginState.value.response.data?.message!!)
+                when(loginState.value.response.data?.status){
+                    BAD_REQUEST -> {
+                        _uiEventFlow.emit(
+                            AppUIEvent.ShowMessage(
+                                message = UIText.DynamicString(loginState.value.response.data?.message!!)
+                            )
                         )
-                    )
-                }else if (loginState.value.response.data?.status == SUCCESS) {
-                    onLoginCompleted("0${loginState.value.mobileNumber}")
+                    }
+                    SUCCESS -> {
+                        onLoginCompleted("0${loginState.value.mobileNumber}")
+                    }
+                    SERVER_CONNECTION ->{
+                        _uiEventFlow.emit(
+                            AppUIEvent.ShowMessage(
+                                message = UIText.StringResource(R.string.connection_problem)
+                            )
+                        )
+                    }
+                    INTERNET_CONNECTION ->{
+                        _uiEventFlow.emit(
+                            AppUIEvent.ShowMessage(
+                                message = UIText.StringResource(R.string.internet_connection_problem)
+                            )
+                        )
+                    }
                 }
+                _loginState.value = loginState.value.copy(
+                    isLoading = false
+                )
             }
         }
     }

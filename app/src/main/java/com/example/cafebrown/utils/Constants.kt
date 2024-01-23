@@ -45,6 +45,8 @@ object ArgumentKeys{
 //region ServerConstants
 object ServerConstants{
     const val BASE_URL = "http://cafeapi.mohammadtazehkar.ir/"
+    const val IMAGE_URL = "http://cafepanel.mohammadtazehkar.ir/CoffeeContent/images/"
+
     const val SUB_URL_POST_MOBILE = "api/Users/SendVerification"
     const val SUB_URL_POST_VERIFICATION = "api/Users/Verify"
     const val SUB_URL_PUT_UPDATE_PROFILE = "api/Users/UpdateProfile"

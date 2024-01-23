@@ -14,7 +14,10 @@ import com.example.cafebrown.presentation.events.VerifyEvent
 import com.example.cafebrown.presentation.states.VerifyState
 import com.example.cafebrown.utils.AppKeyboard
 import com.example.cafebrown.utils.ArgumentKeys.MOBILE_NUMBER
+import com.example.cafebrown.utils.JSonStatusCode
 import com.example.cafebrown.utils.JSonStatusCode.BAD_REQUEST
+import com.example.cafebrown.utils.JSonStatusCode.INTERNET_CONNECTION
+import com.example.cafebrown.utils.JSonStatusCode.SERVER_CONNECTION
 import com.example.cafebrown.utils.JSonStatusCode.SUCCESS
 import com.example.cafebrown.utils.Resource
 import com.example.cafebrown.utils.UIText
@@ -84,12 +87,6 @@ class VerifyViewModel @Inject constructor(
                 verify(onNavigateToProfile = event.onNavigateToProfile, onNavigateToHome = event.onNavigateToHome)
             }
 
-            is VerifyEvent.UpdateLoading -> {
-                _verifyState.value = verifyState.value.copy(
-                    isLoading = event.status
-                )
-            }
-
             is VerifyEvent.AcceptRules -> {
                 _verifyState.value = verifyState.value.copy(
                     isRulesAccepted = true
@@ -143,26 +140,47 @@ class VerifyViewModel @Inject constructor(
     ) {
         if (verifyState.value.isResendCodeState){
             _verifyState.value = verifyState.value.copy(
+                isLoading = true,
                 responseMobile = Resource.Loading()
             )
             viewModelScope.launch {
                 _verifyState.value = verifyState.value.copy(
                     responseMobile = postMobileUseCase.execute(verifyState.value.mobileNumber)
                 )
-                if (_verifyState.value.responseMobile.data?.status == BAD_REQUEST) {
-                    _uiEventFlow.emit(
-                        AppUIEvent.ShowMessage(
-                            message = UIText.DynamicString(verifyState.value.responseMobile.data?.message!!)
+                when(verifyState.value.responseMobile.data?.status){
+                    BAD_REQUEST -> {
+                        _uiEventFlow.emit(
+                            AppUIEvent.ShowMessage(
+                                message = UIText.DynamicString(verifyState.value.responseMobile.data?.message!!)
+                            )
                         )
-                    )
-                } else if (_verifyState.value.responseMobile.data?.status == SUCCESS) {
-                    startTimer()
-                    _verifyState.value = verifyState.value.copy(
-                        verifyCode = "",
-                        isResendCodeState = false,
-                        isTimerVisible = true
-                    )
+                    }
+                    SUCCESS -> {
+                        startTimer()
+                        _verifyState.value = verifyState.value.copy(
+                            verifyCode = "",
+                            isResendCodeState = false,
+                            isTimerVisible = true
+                        )
+                    }
+                    SERVER_CONNECTION ->{
+                        _uiEventFlow.emit(
+                            AppUIEvent.ShowMessage(
+                                message = UIText.StringResource(R.string.connection_problem)
+                            )
+                        )
+                    }
+                    INTERNET_CONNECTION ->{
+                        _uiEventFlow.emit(
+                            AppUIEvent.ShowMessage(
+                                message = UIText.StringResource(R.string.internet_connection_problem)
+                            )
+                        )
+                    }
                 }
+                _verifyState.value = verifyState.value.copy(
+                    isLoading = false
+                )
             }
         }
         else{
@@ -204,6 +222,7 @@ class VerifyViewModel @Inject constructor(
             }
             else {
                 _verifyState.value = verifyState.value.copy(
+                    isLoading = true,
                     responseVerify = Resource.Loading()
                 )
                 viewModelScope.launch {
@@ -213,19 +232,39 @@ class VerifyViewModel @Inject constructor(
                             verifyState.value.verifyCode
                         )
                     )
-                    if (_verifyState.value.responseVerify.data?.status == BAD_REQUEST) {
-                        _uiEventFlow.emit(
-                            AppUIEvent.ShowMessage(
-                                message = UIText.DynamicString(verifyState.value.responseVerify.data?.message!!)
+                    when(verifyState.value.responseVerify.data?.status){
+                        BAD_REQUEST -> {
+                            _uiEventFlow.emit(
+                                AppUIEvent.ShowMessage(
+                                    message = UIText.DynamicString(verifyState.value.responseVerify.data?.message!!)
+                                )
                             )
-                        )
-                    } else if (_verifyState.value.responseVerify.data?.status == SUCCESS) {
-                        if (_verifyState.value.responseVerify.data?.data?.firstName?.isEmpty()!!) {
-                            onNavigateToProfile()
-                        }else{
-                            onNavigateToHome()
+                        }
+                        SUCCESS -> {
+                            if (_verifyState.value.responseVerify.data?.data?.firstName?.isEmpty()!!) {
+                                onNavigateToProfile()
+                            }else{
+                                onNavigateToHome()
+                            }
+                        }
+                        SERVER_CONNECTION ->{
+                            _uiEventFlow.emit(
+                                AppUIEvent.ShowMessage(
+                                    message = UIText.StringResource(R.string.connection_problem)
+                                )
+                            )
+                        }
+                        INTERNET_CONNECTION ->{
+                            _uiEventFlow.emit(
+                                AppUIEvent.ShowMessage(
+                                    message = UIText.StringResource(R.string.internet_connection_problem)
+                                )
+                            )
                         }
                     }
+                    _verifyState.value = verifyState.value.copy(
+                        isLoading = false
+                    )
                 }
             }
         }

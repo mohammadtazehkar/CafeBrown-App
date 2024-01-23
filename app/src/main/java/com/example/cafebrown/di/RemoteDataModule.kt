@@ -2,9 +2,11 @@ package com.example.cafebrown.di
 
 import com.example.cafebrown.data.api.APIService
 import com.example.cafebrown.data.repository.datasource.LoginRemoteDataSource
+import com.example.cafebrown.data.repository.datasource.MenuRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ProfileRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.VerifyRemoteDataSource
 import com.example.cafebrown.data.repository.datasourceImpl.LoginRemoteDataSourceImpl
+import com.example.cafebrown.data.repository.datasourceImpl.MenuRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.ProfileRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.VerifyRemoteDataSourceImpl
 import dagger.Module
@@ -39,5 +41,13 @@ class RemoteDataModule {
         apiService: APIService
     ): ProfileRemoteDataSource {
         return ProfileRemoteDataSourceImpl(apiService)
+    }
+
+    @Singleton
+    @Provides
+    fun provideMenuRemoteDataSource(
+        apiService: APIService
+    ): MenuRemoteDataSource {
+        return MenuRemoteDataSourceImpl(apiService)
     }
 }
