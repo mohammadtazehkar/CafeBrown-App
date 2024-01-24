@@ -3,14 +3,17 @@ package com.example.cafebrown.di
 import com.example.cafebrown.data.repository.datasource.AppLocalDataSource
 import com.example.cafebrown.data.repository.datasource.LoginRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ProfileRemoteDataSource
+import com.example.cafebrown.data.repository.datasource.TransactionRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.VerifyRemoteDataSource
 import com.example.cafebrown.data.repository.repositoryImpl.CheckUserDataRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.LoginRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.ProfileRepositoryImpl
+import com.example.cafebrown.data.repository.repositoryImpl.TransactionRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.VerifyRepositoryImpl
 import com.example.cafebrown.domain.repository.CheckUserDataRepository
 import com.example.cafebrown.domain.repository.LoginRepository
 import com.example.cafebrown.domain.repository.ProfileRepository
+import com.example.cafebrown.domain.repository.TransactionRepository
 import com.example.cafebrown.domain.repository.VerifyRepository
 import com.example.cafebrown.utils.NetworkUtil
 import dagger.Module
@@ -27,17 +30,18 @@ class RepositoryModule {
     @Provides
     fun provideCheckUserDataRepository(
         appLocalDataSource: AppLocalDataSource
-    ): CheckUserDataRepository{
+    ): CheckUserDataRepository {
         return CheckUserDataRepositoryImpl(
             appLocalDataSource
         )
     }
+
     @Singleton
     @Provides
     fun provideLoginRepository(
         loginRemoteDataSource: LoginRemoteDataSource,
         networkUtil: NetworkUtil
-    ): LoginRepository{
+    ): LoginRepository {
         return LoginRepositoryImpl(
             loginRemoteDataSource,
             networkUtil
@@ -50,7 +54,7 @@ class RepositoryModule {
         verifyRemoteDataSource: VerifyRemoteDataSource,
         appLocalDataSource: AppLocalDataSource,
         networkUtil: NetworkUtil
-    ): VerifyRepository{
+    ): VerifyRepository {
         return VerifyRepositoryImpl(
             verifyRemoteDataSource,
             appLocalDataSource,
@@ -64,9 +68,23 @@ class RepositoryModule {
         profileRemoteDataSource: ProfileRemoteDataSource,
         appLocalDataSource: AppLocalDataSource,
         networkUtil: NetworkUtil
-    ): ProfileRepository{
+    ): ProfileRepository {
         return ProfileRepositoryImpl(
             profileRemoteDataSource,
+            appLocalDataSource,
+            networkUtil
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideTransactionRepository(
+        transactionRemoteDataSource: TransactionRemoteDataSource,
+        appLocalDataSource: AppLocalDataSource,
+        networkUtil: NetworkUtil
+    ): TransactionRepository {
+        return TransactionRepositoryImpl(
+            transactionRemoteDataSource,
             appLocalDataSource,
             networkUtil
         )

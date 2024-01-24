@@ -3,9 +3,11 @@ package com.example.cafebrown.di
 import com.example.cafebrown.data.api.APIService
 import com.example.cafebrown.data.repository.datasource.LoginRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ProfileRemoteDataSource
+import com.example.cafebrown.data.repository.datasource.TransactionRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.VerifyRemoteDataSource
 import com.example.cafebrown.data.repository.datasourceImpl.LoginRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.ProfileRemoteDataSourceImpl
+import com.example.cafebrown.data.repository.datasourceImpl.TransactionRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.VerifyRemoteDataSourceImpl
 import dagger.Module
 import dagger.Provides
@@ -39,5 +41,11 @@ class RemoteDataModule {
         apiService: APIService
     ): ProfileRemoteDataSource {
         return ProfileRemoteDataSourceImpl(apiService)
+    }
+
+    @Singleton
+    @Provides
+    fun provideTransactionRemoteDataSource(apiService: APIService): TransactionRemoteDataSource {
+        return TransactionRemoteDataSourceImpl(apiService)
     }
 }

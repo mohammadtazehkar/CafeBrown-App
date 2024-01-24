@@ -3,9 +3,11 @@ package com.example.cafebrown.di
 import com.example.cafebrown.domain.repository.CheckUserDataRepository
 import com.example.cafebrown.domain.repository.LoginRepository
 import com.example.cafebrown.domain.repository.ProfileRepository
+import com.example.cafebrown.domain.repository.TransactionRepository
 import com.example.cafebrown.domain.repository.VerifyRepository
 import com.example.cafebrown.domain.usecase.CheckUserDataUseCase
 import com.example.cafebrown.domain.usecase.GetProfileDataUseCase
+import com.example.cafebrown.domain.usecase.GetTransactionListUseCase
 import com.example.cafebrown.domain.usecase.PostMobileUseCase
 import com.example.cafebrown.domain.usecase.PostVerificationCodeUseCase
 import com.example.cafebrown.domain.usecase.UpdateProfileDataUseCase
@@ -23,14 +25,15 @@ class UseCaseModule {
     @Provides
     fun provideCheckUserDataUseCase(
         checkUserDataRepository: CheckUserDataRepository
-    ):CheckUserDataUseCase{
+    ): CheckUserDataUseCase {
         return CheckUserDataUseCase(checkUserDataRepository)
     }
+
     @Singleton
     @Provides
     fun providePostMobileUseCase(
         loginRepository: LoginRepository
-    ):PostMobileUseCase{
+    ): PostMobileUseCase {
         return PostMobileUseCase(loginRepository)
     }
 
@@ -38,7 +41,7 @@ class UseCaseModule {
     @Provides
     fun providePostVerificationCodeUseCase(
         verifyRepository: VerifyRepository
-    ):PostVerificationCodeUseCase{
+    ): PostVerificationCodeUseCase {
         return PostVerificationCodeUseCase(verifyRepository)
     }
 
@@ -46,7 +49,7 @@ class UseCaseModule {
     @Provides
     fun provideGetProfileDataUseCase(
         profileRepository: ProfileRepository
-    ):GetProfileDataUseCase{
+    ): GetProfileDataUseCase {
         return GetProfileDataUseCase(profileRepository)
     }
 
@@ -54,8 +57,16 @@ class UseCaseModule {
     @Provides
     fun provideUpdateProfileDataUseCase(
         profileRepository: ProfileRepository
-    ):UpdateProfileDataUseCase{
+    ): UpdateProfileDataUseCase {
         return UpdateProfileDataUseCase(profileRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGetTransactionListUseCase(
+        transactionRepository: TransactionRepository
+    ): GetTransactionListUseCase {
+        return GetTransactionListUseCase(transactionRepository)
     }
 
 }

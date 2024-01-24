@@ -1,8 +1,5 @@
 package com.example.cafebrown.ui.screens
 
-import android.content.Context
-import android.content.ContextWrapper
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -21,10 +18,17 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,27 +36,72 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cafebrown.R
+import com.example.cafebrown.data.models.transaction.UserTransactionsData
+import com.example.cafebrown.presentation.events.AppUIEvent
 import com.example.cafebrown.presentation.events.TransactionEvent
 import com.example.cafebrown.presentation.viewmodels.TransactionViewModel
+import com.example.cafebrown.ui.components.AppSnackBar
 import com.example.cafebrown.ui.components.AppTopAppBar
 import com.example.cafebrown.ui.components.MainBox
+import com.example.cafebrown.ui.components.MainColumn
+import com.example.cafebrown.ui.components.ProgressBarDialog
 import com.example.cafebrown.ui.components.TextTitleMedium
 import com.example.cafebrown.ui.components.TextTitleSmall
 import com.example.cafebrown.ui.theme.AppTheme
 import com.example.cafebrown.utils.ClickHelper
+import com.example.cafebrown.utils.UIText
+
 
 @Composable
 fun TransactionScreen(
-    transactionViewModel: TransactionViewModel = viewModel(),
+    transactionViewModel: TransactionViewModel = hiltViewModel(),
     onNavUp: () -> Unit
 ) {
-//    val context = LocalContext.current.getActivity()!!
+    val context = LocalContext.current
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(key1 = true) {
+        transactionViewModel.screenSharedFlow.collect { uiEvent ->
+            when (uiEvent) {
+                is AppUIEvent.ShowMessage -> {
+                    val result =
+                        snackbarHostState.showSnackbar(
+                            message = uiEvent.message.asString(context),
+                            actionLabel = UIText.StringResource(R.string.try_again)
+                                .asString(context),
+                            duration = SnackbarDuration.Indefinite
+                        )
+                    when (result) {
+                        ActionPerformed -> {
+                            transactionViewModel.onEvent(TransactionEvent.GetTransactionListFromServer)
+                        }
+
+                        Dismissed -> TODO()
+                    }
+                }
+                //is token expired //todo
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        transactionViewModel.onEvent(TransactionEvent.GetTransactionListFromServer)
+    }
+
+    if (transactionViewModel.transactionState.value.isLoading) {
+        ProgressBarDialog {
+
+        }
+    }
+
     var transactionState = transactionViewModel.transactionState.value
     if (transactionState.isDialogVisible) {
         IncreaseBalanceDialog(
-            balance = transactionState.balance,
+            balance = transactionState.balance.toString(),
             onDismissRequest = {
                 transactionViewModel.onEvent(TransactionEvent.ChangeDialogVisibility(false))
             },
@@ -78,17 +127,16 @@ fun TransactionScreen(
             isBackVisible = true,
             onBack = onNavUp
         )
-    }, bottomBar = {
-        transactionBottomBar(transactionState.balance, {
-            transactionViewModel.onEvent(
-                TransactionEvent.ChangeDialogVisibility(true)
-            )
-        })
+    }, snackbarHost = {
+        SnackbarHost(snackbarHostState) {
+            AppSnackBar(it)
+        }
     }) {
-        MainBox {
+        MainColumn() {
             LazyVerticalGrid(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .weight(2.0F)
                     .padding(it), columns = GridCells.Fixed(2)
             ) {
                 items(count = transactionState.transactionList.size) { index ->
@@ -98,6 +146,12 @@ fun TransactionScreen(
                     )
                 }
             }
+
+            TransactionBottomBar(transactionState.balance.toString(), {
+                transactionViewModel.onEvent(
+                    TransactionEvent.ChangeDialogVisibility(true)
+                )
+            })
         }
 
     }
@@ -106,7 +160,7 @@ fun TransactionScreen(
 
 @Composable
 fun TransactionGridItem(
-    modifier: Modifier = Modifier, transactionData: TransactionItemData, shouldShowDivider: Boolean
+    modifier: Modifier = Modifier, transactionData: UserTransactionsData, shouldShowDivider: Boolean
 ) {
     Box(modifier = modifier.height(IntrinsicSize.Max)) {
         if (shouldShowDivider) Divider(
@@ -122,26 +176,35 @@ fun TransactionGridItem(
                 modifier = Modifier
                     .padding(vertical = 8.dp)
                     .size(64.dp),
-                painter = painterResource(id = transactionData.image),
-                contentDescription = transactionData.imageName
+                painter = painterResource(
+                    id = when (transactionData.transactionTypeId) {
+                        0 -> R.mipmap.ic_wallet
+                        1 -> R.mipmap.ic_transaction
+                        else -> R.mipmap.ic_wallet
+                    }
+                ),
+                contentDescription = transactionData.transactionType
             )
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 TextTitleMedium(
-                    text = "${transactionData.price} ${stringResource(id = R.string.toman)}",
+                    text = "${transactionData.amount} ${stringResource(id = R.string.toman)}",
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
-            TextTitleSmall(text = transactionData.type)
+            TextTitleSmall(text = transactionData.transactionType!!)
             Row(modifier = Modifier.padding(vertical = 4.dp)) {
                 TextTitleSmall(
-                    text = transactionData.transactionDate,
+                    text = transactionData.dateTime!!,
                     modifier = Modifier
                         .weight(2.0F)
                         .padding(start = 12.dp),
                     textAlign = TextAlign.Left
                 )
                 TextTitleSmall(
-                    text = transactionData.status, modifier = Modifier.padding(end = 10.dp)
+                    text = when (transactionData.status) {
+                        true -> stringResource(id = R.string.successfully)
+                        false -> stringResource(id = R.string.failed)
+                    }, modifier = Modifier.padding(end = 10.dp)
                 )
             }
             Divider(modifier = Modifier.padding(horizontal = 8.dp))
@@ -151,7 +214,7 @@ fun TransactionGridItem(
 }
 
 @Composable
-fun transactionBottomBar(price: String, onClick: () -> Unit) {
+fun TransactionBottomBar(price: String, onClick: () -> Unit) {
 //    val context = LocalContext.current
     Row(
         modifier = Modifier.background(MaterialTheme.colorScheme.background),
@@ -255,18 +318,3 @@ fun preview() {
 //        }
     }
 }
-
-fun Context.getActivity(): AppCompatActivity? = when (this) {
-    is AppCompatActivity -> this
-    is ContextWrapper -> baseContext.getActivity()
-    else -> null
-}
-
-data class TransactionItemData(
-    val image: Int,
-    val imageName: String,
-    val price: String,
-    val type: String,
-    val status: String,
-    val transactionDate: String
-)
