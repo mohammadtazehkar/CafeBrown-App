@@ -24,9 +24,10 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -34,36 +35,41 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.cafebrown.R
+import com.example.cafebrown.data.models.product.ProductResponse
+import com.example.cafebrown.data.models.product.SubMenuResponse
 import com.example.cafebrown.presentation.events.AppUIEvent
+import com.example.cafebrown.presentation.events.MenuEvent
 import com.example.cafebrown.presentation.events.ProductListEvent
 import com.example.cafebrown.presentation.viewmodels.ProductListViewModel
 import com.example.cafebrown.ui.components.AppSnackBar
 import com.example.cafebrown.ui.components.AppTopAppBar
 import com.example.cafebrown.ui.components.MainColumn
-import com.example.cafebrown.ui.components.TextLabelSmall
 import com.example.cafebrown.ui.components.TextTitleMedium
 import com.example.cafebrown.ui.components.TextTitleSmall
 import com.example.cafebrown.ui.components.TextTitleSmallPrimary
-import com.example.cafebrown.ui.theme.AppTheme
 import com.example.cafebrown.utils.ClickHelper
 import com.example.cafebrown.utils.Destinations.RESERVE_SCREEN
+import com.example.cafebrown.utils.ServerConstants.IMAGE_URL
+import com.example.cafebrown.utils.UIText
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun ProductListScreen(
-    productListViewModel: ProductListViewModel = viewModel(),
+    productListViewModel: ProductListViewModel = hiltViewModel(),
     onNavigateToDetail: (Int, String) -> Unit,
     onNavUp: () -> Unit,
+    onExpiredToken: () -> Unit
 ) {
     val productState = productListViewModel.productListState.value
     val context = LocalContext.current
@@ -73,14 +79,33 @@ fun ProductListScreen(
         productListViewModel.uiEventFlow.collectLatest { event ->
             when (event) {
                 is AppUIEvent.ShowMessage -> {
-                    snackBarHostState.showSnackbar(
-                        message = event.message.asString(context)
-                    )
+                    val result = snackBarHostState
+                        .showSnackbar(
+                            message = event.message.asString(context),
+                            actionLabel = UIText.StringResource(R.string.try_again)
+                                .asString(context),
+                            duration = SnackbarDuration.Indefinite
+                        )
+                    when (result) {
+                        SnackbarResult.ActionPerformed -> {
+                            productListViewModel.onEvent(ProductListEvent.GetListFromServer)
+                        }
+                        else -> {}
+                    }
                 }
-
-                else -> {}
+                is AppUIEvent.ExpiredToken ->{
+                    snackBarHostState.showSnackbar(
+                        message = UIText.StringResource(R.string.expired_token)
+                            .asString(context)
+                    )
+                    delay(500)  // the delay of 0.5 seconds
+                    onExpiredToken()
+                }
             }
         }
+    }
+    LaunchedEffect(Unit){
+        productListViewModel.onEvent(ProductListEvent.GetListFromServer)
     }
 
     Scaffold(
@@ -102,13 +127,10 @@ fun ProductListScreen(
                     .padding(paddingValues)
             ) {
                 SubCategoryList(
+                    selectedCategoryId = productState.selectedCategoryId,
                     items = productState.subCategoryListState,
                     onItemClick = { subCategoryId ->
-                        productListViewModel.onEvent(
-                            ProductListEvent.SelectSubCategory(
-                                subCategoryId
-                            )
-                        )
+                        productListViewModel.onEvent(ProductListEvent.SelectSubCategory(subCategoryId))
                     }
                 )
 //                if (categoryList.isNotEmpty()) {
@@ -136,7 +158,8 @@ fun ProductListScreen(
 
 @Composable
 fun SubCategoryList(
-    items: List<SubCategoryItemData>,
+    selectedCategoryId: Int,
+    items: List<SubMenuResponse>,
     onItemClick: (Int) -> Unit
 ) {
     LazyRow(
@@ -149,7 +172,7 @@ fun SubCategoryList(
                 Spacer(modifier = Modifier.width(1.dp))
             }
             items(items.size) { index ->
-                SubCategoryListItem(item = items[index], onItemClick = onItemClick)
+                SubCategoryListItem(selectedCategoryId = selectedCategoryId, item = items[index], onItemClick = onItemClick)
             }
             item {
                 Spacer(modifier = Modifier.width(1.dp))
@@ -160,7 +183,8 @@ fun SubCategoryList(
 
 @Composable
 fun SubCategoryListItem(
-    item: SubCategoryItemData,
+    selectedCategoryId : Int,
+    item: SubMenuResponse,
     onItemClick: (Int) -> Unit
 ) {
 //    if (item.isSelected){
@@ -182,7 +206,7 @@ fun SubCategoryListItem(
                     .clickOnce { onItemClick(item.id) }
             }
     ) {
-        if (item.isSelected) {
+        if (item.id == selectedCategoryId ) {
             TextTitleSmallPrimary(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                 text = item.title
@@ -213,7 +237,7 @@ fun SubCategoryListItem(
 
 @Composable
 fun ProductGrid(
-    items: List<ProductListItemData>,
+    items: List<ProductResponse>,
     onItemClick: (Int, String) -> Unit,
     onDecrease: () -> Unit,
     onIncrease: () -> Unit,
@@ -244,7 +268,7 @@ fun ProductGrid(
 @Composable
 fun ProductGridItem(
     isOdd: Boolean,
-    item: ProductListItemData,
+    item: ProductResponse,
     onItemClick: (Int, String) -> Unit,
     onDecrease: () -> Unit,
     onIncrease: () -> Unit,
@@ -270,25 +294,15 @@ fun ProductGridItem(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-//            AsyncImage(
-//                model = IMAGE_URL + item.imageUrl,
-//                contentDescription = null,
-//                modifier = Modifier
-//                    .padding(top = 24.dp)
-//                    .size(itemSize)
-//                    .clip(CircleShape)// clip to the circle shape
-//                    .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape),
-//                contentScale = ContentScale.Crop
-//            )
-            Image(
-                contentScale = ContentScale.Crop,// crop the image if it's not a square
+            AsyncImage(
+                model = IMAGE_URL + item.url,
+                contentDescription = null,
                 modifier = Modifier
                     .padding(top = 24.dp)
                     .size(itemSize)
                     .clip(CircleShape)// clip to the circle shape
                     .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape),
-                painter = painterResource(id = item.resId),
-                contentDescription = null
+                contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.height(16.dp))
             Row(modifier = Modifier.padding(horizontal = 16.dp)) {
@@ -340,27 +354,3 @@ fun ProductGridItem(
     }
 
 }
-
-data class ProductListItemData(
-    val id: Int,
-    val title: String,
-    val fee: String,
-    val categoryId: Int,
-    val resId: Int,
-    val price: Int
-)
-
-data class SubCategoryItemData(var id: Int, var title: String, var isSelected: Boolean)
-
-//@Preview(showBackground = false, showSystemUi = true)
-//@Composable
-//fun SimpleView() {
-//    AppTheme {
-//        Surface {
-//            var x : (Int , String) -> Unit = { x , y -> x }
-//            ProductGridItem(false,ProductListItemData(
-//                1, "قهوه","75",1, R.drawable.coffee_cup
-//            ),x)
-//        }
-//    }
-//}

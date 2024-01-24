@@ -1,16 +1,18 @@
 package com.example.cafebrown.presentation.states
 
-import com.example.cafebrown.ui.screens.ProductListItemData
-import com.example.cafebrown.ui.screens.SubCategoryItemData
+import com.example.cafebrown.data.models.product.APIGetSubMenuAndProductResponse
+import com.example.cafebrown.data.models.product.ProductResponse
+import com.example.cafebrown.data.models.product.SubMenuResponse
+import com.example.cafebrown.utils.Resource
 
 
 data class ProductListState(
     var isLoading : Boolean = true,
     var selectedCategoryId: Int,
-    var subCategoryListState : List<SubCategoryItemData> = mutableListOf(),
-    var productListState : List<ProductListItemData> = mutableListOf(),
+    var subCategoryListState : MutableList<SubMenuResponse> = mutableListOf(),
+    var productListState : List<ProductResponse> = emptyList(),
     var from : String,
     var total: Int,
-    var selectedCount: Int
-//    var response: Resource<APIHomeDataResponse>
+    var selectedCount: Int,
+    var response: Resource<APIGetSubMenuAndProductResponse>
 )

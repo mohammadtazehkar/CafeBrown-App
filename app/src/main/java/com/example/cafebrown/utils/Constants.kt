@@ -71,6 +71,19 @@ object ServerConstants{
 
     const val AUTHORIZATION = "Authorization"
     const val TOKEN_TYPE = "bearer"
+    const val MENU_ID = "menuId";
+    const val PRODUCT_ID = "productId";
+    const val TABLE_ID = "tableId";
+    const val PAGE_NUMBER = "pageNumber";
+    const val NOTIFICATION_KEY = "notificationKey";
+    const val TELEGRAM = "Telegram";
+    const val INSTAGRAM = "Instagram";
+    const val SUPPORT_NUMBER = "SupportNumber";
+    const val DESCRIPTION = "Description";
+    const val ADDRESS = "Address";
+    const val WIFI = "WirelessPassword";
+    const val WIRELESS_PASSWORD = "WirelessPassword";
+    const val RESERVE_ID = "reserveId";
 
 }
 //endregion

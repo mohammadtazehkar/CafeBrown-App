@@ -3,11 +3,13 @@ package com.example.cafebrown.di
 import com.example.cafebrown.domain.repository.CheckUserDataRepository
 import com.example.cafebrown.domain.repository.LoginRepository
 import com.example.cafebrown.domain.repository.MenuRepository
+import com.example.cafebrown.domain.repository.ProductRepository
 import com.example.cafebrown.domain.repository.ProfileRepository
 import com.example.cafebrown.domain.repository.VerifyRepository
 import com.example.cafebrown.domain.usecase.CheckUserDataUseCase
 import com.example.cafebrown.domain.usecase.GetMenuListUseCase
 import com.example.cafebrown.domain.usecase.GetProfileDataUseCase
+import com.example.cafebrown.domain.usecase.GetSubMenuAndProductListUseCase
 import com.example.cafebrown.domain.usecase.PostMobileUseCase
 import com.example.cafebrown.domain.usecase.PostVerificationCodeUseCase
 import com.example.cafebrown.domain.usecase.UpdateProfileDataUseCase
@@ -66,6 +68,14 @@ class UseCaseModule {
         menuRepository: MenuRepository
     ):GetMenuListUseCase{
         return GetMenuListUseCase(menuRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGetSubMenuAndProductListUseCase(
+        productRepository: ProductRepository
+    ):GetSubMenuAndProductListUseCase{
+        return GetSubMenuAndProductListUseCase(productRepository)
     }
 
 }

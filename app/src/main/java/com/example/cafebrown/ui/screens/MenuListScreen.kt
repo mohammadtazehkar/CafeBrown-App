@@ -137,7 +137,7 @@ fun MenuListScreen(
                     )
                 } else {
                     Column(
-                        modifier = Modifier.fillMaxHeight(),
+                        modifier = Modifier.fillMaxHeight().align(Alignment.Center),
                         verticalArrangement = Arrangement.Center
                     ) {
                         EmptyView(text = stringResource(id = R.string.empty_menu_view))

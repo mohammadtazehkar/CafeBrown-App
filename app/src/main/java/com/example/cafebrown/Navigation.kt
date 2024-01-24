@@ -383,6 +383,19 @@ fun AppNavHost(
                 onNavigateToDetail = { productId, productTitle ->
                     navController.navigate("$PRODUCT_DETAIL_SCREEN/$productId/$productTitle")
                 },
+                onExpiredToken = {
+                    navController.navigate(SPLASH_SCREEN){
+                        popUpTo("$PRODUCT_LIST_SCREEN/{$CATEGORY_ID}/{$FROM}") {
+                            inclusive = true
+                        }
+                        popUpTo("$MENU_LIST_SCREEN/{$FROM}") {
+                            inclusive = true
+                        }
+                        popUpTo(HOME_SCREEN) {
+                            inclusive = true
+                        }
+                    }
+                },
                 onNavUp = navController::navigateUp
             )
         }
