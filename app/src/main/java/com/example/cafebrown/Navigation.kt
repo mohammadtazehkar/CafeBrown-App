@@ -10,11 +10,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.cafebrown.ui.screens.*
+import com.example.cafebrown.utils.ArgumentKeys.CAPACITY
 import com.example.cafebrown.utils.ArgumentKeys.CATEGORY_ID
+import com.example.cafebrown.utils.ArgumentKeys.DESK_ID
 import com.example.cafebrown.utils.ArgumentKeys.FROM
 import com.example.cafebrown.utils.ArgumentKeys.MOBILE_NUMBER
 import com.example.cafebrown.utils.ArgumentKeys.PRODUCT_ID
 import com.example.cafebrown.utils.ArgumentKeys.PRODUCT_TITLE
+import com.example.cafebrown.utils.ArgumentKeys.STATUS
+import com.example.cafebrown.utils.ArgumentKeys.TABLE_NUMBER
 import com.example.cafebrown.utils.Constants.NAV_INFO
 import com.example.cafebrown.utils.Constants.NAV_MENU
 import com.example.cafebrown.utils.Constants.NAV_PROFILE
@@ -468,14 +472,32 @@ fun AppNavHost(
             }
         ) {
             DeskListScreen(
-                onNavigateToReserve = {
-                    navController.navigate(RESERVE_SCREEN)
+                onNavigateToReserve = { deskId, capacity, tableNumber, status ->
+                    navController.navigate("$RESERVE_SCREEN/$deskId/$capacity/$tableNumber/$status")
                 },
                 onNavUp = navController::navigateUp
             )
         }
         composable(
-            route = RESERVE_SCREEN,
+            route = "$RESERVE_SCREEN/{$DESK_ID}/{$CAPACITY}/{$TABLE_NUMBER}/{$STATUS}",
+            arguments = listOf(
+                navArgument(DESK_ID) {
+                    type = NavType.IntType
+                    defaultValue = 0
+                },
+                navArgument(CAPACITY) {
+                    type = NavType.IntType
+                    defaultValue = 0
+                },
+                navArgument(TABLE_NUMBER) {
+                    type = NavType.IntType
+                    defaultValue = 0
+                },
+                navArgument(STATUS) {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
+            ),
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,

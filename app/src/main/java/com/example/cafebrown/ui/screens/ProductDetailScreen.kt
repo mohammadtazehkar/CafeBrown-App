@@ -101,9 +101,9 @@ fun ProductSlider(
     imageList: List<String>,
 ){
     Column(modifier = modifier) {
-        AppBannerPager(
-            images = imageList
-        )
+//        AppBannerPager(
+//            images = imageList
+//        )
     }
 }
 

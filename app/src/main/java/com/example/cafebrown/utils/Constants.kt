@@ -38,6 +38,10 @@ object ArgumentKeys{
     const val CATEGORY_ID = "categoryId"
     const val PRODUCT_ID = "productId"
     const val PRODUCT_TITLE = "productTitle"
+    const val DESK_ID = "deskId"
+    const val CAPACITY = "capacity"
+    const val TABLE_NUMBER = "tableNumber"
+    const val STATUS = "status"
 
 }
 //endregion
@@ -45,6 +49,7 @@ object ArgumentKeys{
 //region ServerConstants
 object ServerConstants{
     const val BASE_URL = "http://cafeapi.mohammadtazehkar.ir/"
+    const val IMAGE_URL = "http://cafepanel.mohammadtazehkar.ir/CoffeeContent/images/"
     const val SUB_URL_POST_MOBILE = "api/Users/SendVerification"
     const val SUB_URL_POST_VERIFICATION = "api/Users/Verify"
     const val SUB_URL_PUT_UPDATE_PROFILE = "api/Users/UpdateProfile"
@@ -69,6 +74,7 @@ object ServerConstants{
 
     const val AUTHORIZATION = "Authorization"
     const val TOKEN_TYPE = "bearer"
+    const val TABLE_ID = "tableId"
 
 }
 //endregion
