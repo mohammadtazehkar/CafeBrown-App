@@ -38,6 +38,10 @@ object ArgumentKeys{
     const val CATEGORY_ID = "categoryId"
     const val PRODUCT_ID = "productId"
     const val PRODUCT_TITLE = "productTitle"
+    const val DESK_ID = "deskId"
+    const val CAPACITY = "capacity"
+    const val TABLE_NUMBER = "tableNumber"
+    const val STATUS = "status"
 
 }
 //endregion
@@ -71,6 +75,7 @@ object ServerConstants{
 
     const val AUTHORIZATION = "Authorization"
     const val TOKEN_TYPE = "bearer"
+    const val TABLE_ID = "tableId"
     const val MENU_ID = "menuId";
     const val PRODUCT_ID = "productId";
     const val TABLE_ID = "tableId";

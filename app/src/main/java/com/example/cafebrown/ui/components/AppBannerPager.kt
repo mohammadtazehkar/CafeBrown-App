@@ -68,13 +68,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import coil.compose.AsyncImage
 import com.example.cafebrown.R
+import com.example.cafebrown.data.models.home.HomeImage
+import com.example.cafebrown.utils.ServerConstants.IMAGE_URL
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppBannerPager(
     modifier: Modifier = Modifier,
-    images : List<String>
+    images : List<HomeImage>
 //    images : List<SlideListData>
 ) {
     val pagerState = rememberPagerState(
@@ -92,8 +94,8 @@ fun AppBannerPager(
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
-//                    model = images[pagerState.currentPage].imageUrl,
-                    model = images[pagerState.currentPage],
+                    model = IMAGE_URL + images[pagerState.currentPage].images,
+//                    model = images[pagerState.currentPage],
                     contentDescription = "Translated description of what the image contains",
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(R.drawable.place_holder_gray)

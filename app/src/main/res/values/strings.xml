@@ -89,6 +89,7 @@
     <string name="please_select_your_reserve_date">لطفا تاریخ رزرو خود را انتخاب کنید </string>
     <string name="please_select_your_reserve_time_and_duration">لطفا ساعت و مدت رزرو خود را انتخاب کنید </string>
     <string name="selected_date_is_ready_for_reserve">تاریخ انتخاب شده برای رزرو آماده است </string>
+    <string name="selected_date_is_not_valid">لطفا تاریخ/زمان رزرو را ویرایش کنید </string>
     <string name="coffee_address">اردبیل ، خیابان والی ، نرسیده به درمانگاه ولیعصر ، کافه براون</string>
     <string name="if_you_follow_quality">اگه به دنبال برنامه نویسی با کیفیت هستید،</string>
     <string name="we_are_ready_for_this">ما برای انجام این کار آماده ایم،</string>

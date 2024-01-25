@@ -1,15 +1,21 @@
 package com.example.cafebrown.di
 
 import com.example.cafebrown.data.api.APIService
+import com.example.cafebrown.data.repository.datasource.DeskRemoteDataSource
+import com.example.cafebrown.data.repository.datasource.HomeRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.LoginRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.MenuRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ProductRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ProfileRemoteDataSource
+import com.example.cafebrown.data.repository.datasource.ReserveRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.VerifyRemoteDataSource
+import com.example.cafebrown.data.repository.datasourceImpl.DeskRemoteDataSourceImpl
+import com.example.cafebrown.data.repository.datasourceImpl.HomeDataRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.LoginRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.MenuRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.ProductRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.ProfileRemoteDataSourceImpl
+import com.example.cafebrown.data.repository.datasourceImpl.ReserveRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.VerifyRemoteDataSourceImpl
 import dagger.Module
 import dagger.Provides
@@ -43,6 +49,29 @@ class RemoteDataModule {
         apiService: APIService
     ): ProfileRemoteDataSource {
         return ProfileRemoteDataSourceImpl(apiService)
+    }
+
+    @Singleton
+    @Provides
+    fun provideHomeRemoteDataSource(
+        apiService: APIService
+    ): HomeRemoteDataSource {
+        return HomeDataRemoteDataSourceImpl(apiService)
+    }
+
+    @Singleton
+    @Provides
+    fun provideDeskRemoteDataSource(
+        apiService: APIService
+    ): DeskRemoteDataSource {
+        return DeskRemoteDataSourceImpl(apiService)
+    }
+    @Singleton
+    @Provides
+    fun provideReserveRemoteDataSource(
+        apiService: APIService
+    ): ReserveRemoteDataSource {
+        return ReserveRemoteDataSourceImpl(apiService)
     }
 
     @Singleton
