@@ -75,7 +75,6 @@ object ServerConstants{
 
     const val AUTHORIZATION = "Authorization"
     const val TOKEN_TYPE = "bearer"
-    const val TABLE_ID = "tableId"
     const val MENU_ID = "menuId";
     const val PRODUCT_ID = "productId";
     const val TABLE_ID = "tableId";

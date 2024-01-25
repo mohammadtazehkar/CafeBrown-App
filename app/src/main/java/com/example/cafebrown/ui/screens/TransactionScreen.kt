@@ -80,10 +80,10 @@ fun TransactionScreen(
                             transactionViewModel.onEvent(TransactionEvent.GetTransactionListFromServer)
                         }
 
-                        Dismissed -> TODO()
+                        Dismissed -> {}
                     }
                 }
-                //is token expired //todo
+                is AppUIEvent.ExpiredToken -> TODO()
             }
         }
     }
@@ -93,9 +93,7 @@ fun TransactionScreen(
     }
 
     if (transactionViewModel.transactionState.value.isLoading) {
-        ProgressBarDialog {
-
-        }
+        ProgressBarDialog ()
     }
 
     var transactionState = transactionViewModel.transactionState.value

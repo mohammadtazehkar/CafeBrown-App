@@ -99,6 +99,8 @@ fun HomeScreen(
                         else -> {}
                     }
                 }
+
+                is AppUIEvent.ExpiredToken -> TODO()
             }
         }
     }
@@ -108,7 +110,7 @@ fun HomeScreen(
     }
 
     if (homeState.isLoading) {
-        ProgressBarDialog {}
+        ProgressBarDialog ()
     }
     Scaffold(
         topBar = {

@@ -53,15 +53,9 @@ interface APIService {
         @Header(AUTHORIZATION) token: String,
         @Query(MENU_ID) menuId: Int
     ): Response<APIGetSubMenuAndProductResponse>
-//    @Headers({"Content-Type: application/json"})
-    suspend fun updateProfile(
-        @Header(AUTHORIZATION) token: String,
-        @Body apiPutUpdateProfileRequest: APIUpdateProfileRequest
-    ): Response<APIGlobalResponse>
 
     @GET(SUB_URL_GET_TRANSACTIONS)
     suspend fun getUserTransactions(@Header(AUTHORIZATION) token: String): Response<APIGetUserTransactionsResponse>
-    suspend fun updateProfile(@Header(AUTHORIZATION) token: String, @Body apiPutUpdateProfileRequest: APIUpdateProfileRequest):Response<APIGlobalResponse>
 
     @GET(SUB_URL_GET_COFFEE_SHOP_DATA)
     suspend fun getHomeData(@Header(AUTHORIZATION) token: String): Response<APIGetHomeDataResponse>

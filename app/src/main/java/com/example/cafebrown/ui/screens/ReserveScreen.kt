@@ -90,6 +90,8 @@ fun ReserveScreen(
                         else -> {}
                     }
                 }
+
+                is AppUIEvent.ExpiredToken -> TODO()
             }
         }
     }
@@ -100,7 +102,7 @@ fun ReserveScreen(
     }
 
     if (reserveState.isLoading) {
-        ProgressBarDialog {}
+        ProgressBarDialog ()
     }
 
     Scaffold(

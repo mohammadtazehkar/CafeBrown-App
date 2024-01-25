@@ -85,6 +85,8 @@ fun DeskListScreen(
                         else -> {}
                     }
                 }
+
+                is AppUIEvent.ExpiredToken -> TODO()
             }
         }
     }
@@ -95,7 +97,7 @@ fun DeskListScreen(
     }
 
     if (deskState.isLoading) {
-        ProgressBarDialog {}
+        ProgressBarDialog()
     }
 
     Scaffold(
