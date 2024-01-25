@@ -36,11 +36,13 @@ fun IncreaseBalanceDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
     onChangeBalance: (String) -> Unit,
-    increaseBalance: String
+    increaseBalance: String,
+    dismissOnBackPress: Boolean = true,
+    dismissOnClickOutside: Boolean = true
 ) {
     Dialog(
         onDismissRequest = { onDismissRequest() }, properties = DialogProperties(
-            dismissOnBackPress = false, dismissOnClickOutside = false
+            dismissOnBackPress = dismissOnBackPress, dismissOnClickOutside = dismissOnClickOutside
         )
     ) {
         CardColumnMediumCorner(columnModifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -99,6 +101,6 @@ fun IncreaseBalanceDialog(
 @Composable
 fun previewDialog() {
     AppTheme {
-        IncreaseBalanceDialog("27000", {}, {}, {}, "3500")
+        IncreaseBalanceDialog("27000", {}, {}, {}, "3500",true,true)
     }
 }

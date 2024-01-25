@@ -6,10 +6,12 @@ import com.example.cafebrown.data.models.product.APIGetSubMenuAndProductResponse
 import com.example.cafebrown.data.models.desk.APIGetDeskResponse
 import com.example.cafebrown.data.models.home.APIGetHomeDataResponse
 import com.example.cafebrown.data.models.profile.APIUpdateProfileRequest
+import com.example.cafebrown.data.models.transaction.APIGetUserTransactionsResponse
 import com.example.cafebrown.data.models.reserve.APIGetReserveBaseInfoResponse
 import com.example.cafebrown.data.models.verify.APIPostVerificationCodeRequest
 import com.example.cafebrown.data.models.verify.APIPostVerificationCodeResponse
 import com.example.cafebrown.utils.ServerConstants.AUTHORIZATION
+import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_TRANSACTIONS
 import com.example.cafebrown.utils.ServerConstants.MENU_ID
 import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_MENU
 import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_SUB_MENU_AND_PRODUCT
@@ -52,6 +54,13 @@ interface APIService {
         @Query(MENU_ID) menuId: Int
     ): Response<APIGetSubMenuAndProductResponse>
 //    @Headers({"Content-Type: application/json"})
+    suspend fun updateProfile(
+        @Header(AUTHORIZATION) token: String,
+        @Body apiPutUpdateProfileRequest: APIUpdateProfileRequest
+    ): Response<APIGlobalResponse>
+
+    @GET(SUB_URL_GET_TRANSACTIONS)
+    suspend fun getUserTransactions(@Header(AUTHORIZATION) token: String): Response<APIGetUserTransactionsResponse>
     suspend fun updateProfile(@Header(AUTHORIZATION) token: String, @Body apiPutUpdateProfileRequest: APIUpdateProfileRequest):Response<APIGlobalResponse>
 
     @GET(SUB_URL_GET_COFFEE_SHOP_DATA)

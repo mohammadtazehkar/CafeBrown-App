@@ -8,6 +8,7 @@ import com.example.cafebrown.data.repository.datasource.MenuRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ProductRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ProfileRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ReserveRemoteDataSource
+import com.example.cafebrown.data.repository.datasource.TransactionRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.VerifyRemoteDataSource
 import com.example.cafebrown.data.repository.datasourceImpl.DeskRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.HomeDataRemoteDataSourceImpl
@@ -15,6 +16,7 @@ import com.example.cafebrown.data.repository.datasourceImpl.LoginRemoteDataSourc
 import com.example.cafebrown.data.repository.datasourceImpl.MenuRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.ProductRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.ProfileRemoteDataSourceImpl
+import com.example.cafebrown.data.repository.datasourceImpl.TransactionRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.ReserveRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.VerifyRemoteDataSourceImpl
 import dagger.Module
@@ -88,5 +90,11 @@ class RemoteDataModule {
         apiService: APIService
     ): ProductRemoteDataSource {
         return ProductRemoteDataSourceImpl(apiService)
+    }
+
+    @Singleton
+    @Provides
+    fun provideTransactionRemoteDataSource(apiService: APIService): TransactionRemoteDataSource {
+        return TransactionRemoteDataSourceImpl(apiService)
     }
 }

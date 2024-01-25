@@ -8,6 +8,7 @@ import com.example.cafebrown.domain.repository.MenuRepository
 import com.example.cafebrown.domain.repository.ProductRepository
 import com.example.cafebrown.domain.repository.ProfileRepository
 import com.example.cafebrown.domain.repository.ReserveRepository
+import com.example.cafebrown.domain.repository.TransactionRepository
 import com.example.cafebrown.domain.repository.VerifyRepository
 import com.example.cafebrown.domain.usecase.CheckUserDataUseCase
 import com.example.cafebrown.domain.usecase.GetMenuListUseCase
@@ -16,6 +17,7 @@ import com.example.cafebrown.domain.usecase.GetHomeDataUseCase
 import com.example.cafebrown.domain.usecase.GetProfileDataUseCase
 import com.example.cafebrown.domain.usecase.GetSubMenuAndProductListUseCase
 import com.example.cafebrown.domain.usecase.GetReserveBaseInfoUseCase
+import com.example.cafebrown.domain.usecase.GetTransactionListUseCase
 import com.example.cafebrown.domain.usecase.PostMobileUseCase
 import com.example.cafebrown.domain.usecase.PostVerificationCodeUseCase
 import com.example.cafebrown.domain.usecase.UpdateProfileDataUseCase
@@ -106,6 +108,14 @@ class UseCaseModule {
         productRepository: ProductRepository
     ):GetSubMenuAndProductListUseCase{
         return GetSubMenuAndProductListUseCase(productRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGetTransactionListUseCase(
+        transactionRepository: TransactionRepository
+    ): GetTransactionListUseCase {
+        return GetTransactionListUseCase(transactionRepository)
     }
 
 }
