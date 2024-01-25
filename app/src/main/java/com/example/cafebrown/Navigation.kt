@@ -230,12 +230,15 @@ fun AppNavHost(
                         NAV_RESERVE -> {
                             navController.navigate(RESERVE_HISTORY_SCREEN)
                         }
+
                         NAV_TRANSACTION -> {
                             navController.navigate(TRANSACTION_SCREEN)
                         }
+
                         NAV_PROFILE -> {
                             navController.navigate("$PROFILE_SCREEN/$HOME_SCREEN")
                         }
+
                         NAV_INFO -> {
                             navController.navigate(ABOUT_US_SCREEN)
                         }
@@ -287,7 +290,7 @@ fun AppNavHost(
                 },
                 onNavUp = navController::navigateUp,
                 onExpiredToken = {
-                    navController.navigate(SPLASH_SCREEN){
+                    navController.navigate(SPLASH_SCREEN) {
                         popUpTo("$PROFILE_SCREEN/{$FROM}") {
                             inclusive = true
                         }
@@ -338,7 +341,7 @@ fun AppNavHost(
                 },
                 onNavUp = navController::navigateUp,
                 onExpiredToken = {
-                    navController.navigate(SPLASH_SCREEN){
+                    navController.navigate(SPLASH_SCREEN) {
                         popUpTo("$MENU_LIST_SCREEN/{$FROM}") {
                             inclusive = true
                         }
@@ -388,7 +391,7 @@ fun AppNavHost(
                     navController.navigate("$PRODUCT_DETAIL_SCREEN/$productId/$productTitle")
                 },
                 onExpiredToken = {
-                    navController.navigate(SPLASH_SCREEN){
+                    navController.navigate(SPLASH_SCREEN) {
                         popUpTo("$PRODUCT_LIST_SCREEN/{$CATEGORY_ID}/{$FROM}") {
                             inclusive = true
                         }
@@ -431,7 +434,17 @@ fun AppNavHost(
             }
         ) {
             TransactionScreen(
-                onNavUp = navController::navigateUp
+                onNavUp = navController::navigateUp,
+                onExpiredToken = {
+                    navController.navigate(SPLASH_SCREEN) {
+                        popUpTo(TRANSACTION_SCREEN) {
+                            inclusive = true
+                        }
+                        popUpTo(HOME_SCREEN) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
 

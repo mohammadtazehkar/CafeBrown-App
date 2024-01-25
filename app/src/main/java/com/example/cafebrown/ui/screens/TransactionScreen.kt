@@ -25,6 +25,7 @@ import androidx.compose.material3.SnackbarResult.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,21 +54,31 @@ import com.example.cafebrown.ui.components.TextTitleSmall
 import com.example.cafebrown.ui.theme.AppTheme
 import com.example.cafebrown.utils.ClickHelper
 import com.example.cafebrown.utils.UIText
+import kotlinx.coroutines.delay
 
 
 @Composable
 fun TransactionScreen(
     transactionViewModel: TransactionViewModel = hiltViewModel(),
-    onNavUp: () -> Unit
+    onNavUp: () -> Unit,
+    onExpiredToken: () -> Unit
 ) {
     val context = LocalContext.current
 
     val snackbarHostState = remember { SnackbarHostState() }
+    val successSnackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
         transactionViewModel.screenSharedFlow.collect { uiEvent ->
             when (uiEvent) {
                 is AppUIEvent.ShowMessage -> {
+                    if (!uiEvent.isError) {
+                        successSnackbarHostState.showSnackbar(
+                            message = uiEvent.message.asString(context),
+                            duration = SnackbarDuration.Short
+                        )
+                        return@collect
+                    }
                     val result =
                         snackbarHostState.showSnackbar(
                             message = uiEvent.message.asString(context),
@@ -83,7 +94,15 @@ fun TransactionScreen(
                         Dismissed -> {}
                     }
                 }
-                is AppUIEvent.ExpiredToken -> TODO()
+
+                is AppUIEvent.ExpiredToken -> {
+                    snackbarHostState.showSnackbar(
+                        message = UIText.StringResource(resId = R.string.expired_token)
+                            .asString(context)
+                    )
+                    delay(500)
+                    onExpiredToken()
+                }
             }
         }
     }
@@ -93,7 +112,7 @@ fun TransactionScreen(
     }
 
     if (transactionViewModel.transactionState.value.isLoading) {
-        ProgressBarDialog ()
+        ProgressBarDialog()
     }
 
     var transactionState = transactionViewModel.transactionState.value
@@ -107,6 +126,7 @@ fun TransactionScreen(
                 transactionViewModel.onEvent(
                     TransactionEvent.ChangeDialogVisibility(false)
                 )
+                transactionViewModel.onEvent(TransactionEvent.PostIncreaseBalanceToServer)
             },
             onChangeBalance = { newVal ->
                 transactionViewModel.onEvent(
@@ -128,6 +148,9 @@ fun TransactionScreen(
     }, snackbarHost = {
         SnackbarHost(snackbarHostState) {
             AppSnackBar(it)
+        }
+        SnackbarHost(successSnackbarHostState) {
+            AppSnackBar(it,true)
         }
     }) {
         MainColumn() {
@@ -257,7 +280,7 @@ fun TransactionBottomBar(price: String, onClick: () -> Unit) {
 @Composable
 fun preview() {
     AppTheme {
-        TransactionScreen(viewModel(), { })
+        TransactionScreen(viewModel(), { }, {})
 //        var trData = mutableListOf(
 //            TransactionItemData(
 //                R.drawable.logo,

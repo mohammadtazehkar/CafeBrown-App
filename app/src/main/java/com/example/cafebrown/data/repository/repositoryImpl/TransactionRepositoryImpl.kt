@@ -1,7 +1,8 @@
 package com.example.cafebrown.data.repository.repositoryImpl
 
-import android.util.Log
+import com.example.cafebrown.data.models.APIGlobalResponse
 import com.example.cafebrown.data.models.transaction.APIGetUserTransactionsResponse
+import com.example.cafebrown.data.models.transaction.APIPostIncreaseBalanceRequest
 import com.example.cafebrown.data.repository.datasource.AppLocalDataSource
 import com.example.cafebrown.data.repository.datasource.TransactionRemoteDataSource
 import com.example.cafebrown.domain.repository.TransactionRepository
@@ -23,13 +24,13 @@ class TransactionRepositoryImpl(
             try {
                 val token = appLocalDataSource.getTokenFromDB()
                 val response = transactionRemoteDataSource.getTransactionList(
-                    token = "$TOKEN_TYPE $token",
+                    token = "$TOKEN_TYPE $token"
                 )
                 if (response.isSuccessful && response.body() != null) {
                     Resource.Success(response.body()!!)
                 } else {
                     if (response.code() == EXPIRED_TOKEN) {
-//                        appLocalDataSource.deleteUserInfo()
+                        appLocalDataSource.deleteUserInfo()
                         Resource.Error(
                             "expired Token",
                             APIGetUserTransactionsResponse(
@@ -67,6 +68,62 @@ class TransactionRepositoryImpl(
                 APIGetUserTransactionsResponse(
                     INTERNET_CONNECTION,
                     null,
+                    "No internet connection"
+                )
+            )
+        }
+    }
+
+    override suspend fun postIncreaseBalance(increaseBalanceObject: APIPostIncreaseBalanceRequest): Resource<APIGlobalResponse> {
+        return if (networkUtil.isInternetAvailable()) {
+//            try {
+                val token = appLocalDataSource.getTokenFromDB()
+                val response = transactionRemoteDataSource.postIncreaseBalance(
+                    "$TOKEN_TYPE $token",
+                    increaseBalanceObject
+                )
+                if (response.isSuccessful && response.body() != null) {
+                    Resource.Success(response.body()!!)
+                } else {
+                    if (response.code() == EXPIRED_TOKEN) {
+                        appLocalDataSource.deleteUserInfo()
+                        Resource.Error(
+                            "expired Token",
+                            APIGlobalResponse(
+                                response.code(),
+                                "",
+                                "expired Token"
+                            )
+                        )
+
+                    } else {
+                        Resource.Error(
+                            "An error occurred",
+                            APIGlobalResponse(
+                                SERVER_CONNECTION,
+                                "",
+                                "An error occurred"
+                            )
+                        )
+                    }
+
+                }
+//            } catch (e: Exception) {
+//                Resource.Error(
+//                    e.message ?: "An error occurred",
+//                    APIGlobalResponse(
+//                        SERVER_CONNECTION,
+//                        "",
+//                        "An error occurred"
+//                    )
+//                )
+//            }
+        } else {
+            Resource.Error(
+                "No internet connection",
+                APIGlobalResponse(
+                    INTERNET_CONNECTION,
+                    "",
                     "No internet connection"
                 )
             )
