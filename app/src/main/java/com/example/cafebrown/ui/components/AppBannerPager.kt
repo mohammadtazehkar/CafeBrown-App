@@ -76,13 +76,19 @@ import com.example.cafebrown.utils.ServerConstants.IMAGE_URL
 @Composable
 fun AppBannerPager(
     modifier: Modifier = Modifier,
-    images : List<HomeImage>
-//    images : List<SlideListData>
+    images : List<HomeImage> = emptyList(),
+    stringImages : List<String> = emptyList()
 ) {
     val pagerState = rememberPagerState(
         initialPage = 0,
         initialPageOffsetFraction = 0f
-    ) { images.size }
+    ) {
+        if (stringImages.isNotEmpty()){
+            stringImages.size
+        }else{
+            images.size
+        }
+    }
     Box(modifier = modifier) {
         HorizontalPager(
             state = pagerState,
@@ -94,7 +100,12 @@ fun AppBannerPager(
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
-                    model = IMAGE_URL + images[pagerState.currentPage].images,
+                    model =
+                    if (stringImages.isNotEmpty()) {
+                        IMAGE_URL + stringImages[pagerState.currentPage]
+                    }else{
+                        IMAGE_URL + images[pagerState.currentPage].images
+                    },
 //                    model = images[pagerState.currentPage],
                     contentDescription = "Translated description of what the image contains",
                     contentScale = ContentScale.Crop,
@@ -108,7 +119,11 @@ fun AppBannerPager(
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 16.dp),
             pagerState = pagerState,
-            indicatorCount = images.size
+            indicatorCount = if (stringImages.isNotEmpty()){
+                stringImages.size
+            }else{
+                images.size
+            }
         )
     }
 }

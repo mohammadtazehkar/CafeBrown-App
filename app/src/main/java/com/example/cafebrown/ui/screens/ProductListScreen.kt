@@ -1,5 +1,6 @@
 package com.example.cafebrown.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,16 +30,24 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -53,8 +62,10 @@ import com.example.cafebrown.presentation.events.ProductListEvent
 import com.example.cafebrown.presentation.viewmodels.ProductListViewModel
 import com.example.cafebrown.ui.components.AppSnackBar
 import com.example.cafebrown.ui.components.AppTopAppBar
+import com.example.cafebrown.ui.components.EmptyView
 import com.example.cafebrown.ui.components.MainColumn
 import com.example.cafebrown.ui.components.TextTitleMedium
+import com.example.cafebrown.ui.components.TextTitleMediumPrimary
 import com.example.cafebrown.ui.components.TextTitleSmall
 import com.example.cafebrown.ui.components.TextTitleSmallPrimary
 import com.example.cafebrown.utils.ClickHelper
@@ -63,6 +74,8 @@ import com.example.cafebrown.utils.ServerConstants.IMAGE_URL
 import com.example.cafebrown.utils.UIText
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun ProductListScreen(
@@ -76,7 +89,7 @@ fun ProductListScreen(
     val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
-        productListViewModel.uiEventFlow.collectLatest { event ->
+        productListViewModel.uiEventFlow.collect { event ->
             when (event) {
                 is AppUIEvent.ShowMessage -> {
                     val result = snackBarHostState
@@ -90,10 +103,12 @@ fun ProductListScreen(
                         SnackbarResult.ActionPerformed -> {
                             productListViewModel.onEvent(ProductListEvent.GetListFromServer)
                         }
+
                         else -> {}
                     }
                 }
-                is AppUIEvent.ExpiredToken ->{
+
+                is AppUIEvent.ExpiredToken -> {
                     snackBarHostState.showSnackbar(
                         message = UIText.StringResource(R.string.expired_token)
                             .asString(context)
@@ -104,8 +119,16 @@ fun ProductListScreen(
             }
         }
     }
-    LaunchedEffect(Unit){
-        productListViewModel.onEvent(ProductListEvent.GetListFromServer)
+    DisposableEffect(Unit) {
+        if (!productState.hasRunEffect) {
+            // Run your code here that you want to execute only once
+            productListViewModel.onEvent(ProductListEvent.UpdateHasRunEffect(true))
+            productListViewModel.onEvent(ProductListEvent.GetListFromServer)
+        }
+
+        onDispose {
+            // Cleanup code, if needed
+        }
     }
 
     Scaffold(
@@ -130,27 +153,43 @@ fun ProductListScreen(
                     selectedCategoryId = productState.selectedCategoryId,
                     items = productState.subCategoryListState,
                     onItemClick = { subCategoryId ->
-                        productListViewModel.onEvent(ProductListEvent.SelectSubCategory(subCategoryId))
+                        productListViewModel.onEvent(
+                            ProductListEvent.SelectSubCategory(
+                                subCategoryId
+                            )
+                        )
                     }
                 )
-//                if (categoryList.isNotEmpty()) {
-                ProductGrid(
-                    items = productState.productListState,
-                    onItemClick = onNavigateToDetail,
-                    onDecrease = { productListViewModel.onEvent(ProductListEvent.DeCreaseCount) },
-                    onIncrease = { productListViewModel.onEvent(ProductListEvent.InCreaseCount) },
-                    selectVisibility = productState.from == RESERVE_SCREEN,
-                    selectedCount = productState.selectedCount,
-                    total = productState.total
-                )
-//                } else {
-//                    Column(
-//                        modifier = Modifier.fillMaxHeight(),
-//                        verticalArrangement = Arrangement.Center
-//                    ) {
-//                        EmptyView(text = stringResource(id = R.string.empty_category_list))
-//                    }
-//                }
+                if (productState.productListState.isNotEmpty()) {
+                    ProductGrid(
+                        items = productState.productListState,
+                        onItemClick = onNavigateToDetail,
+                        onDecrease = { productListViewModel.onEvent(ProductListEvent.DeCreaseCount) },
+                        onIncrease = { productListViewModel.onEvent(ProductListEvent.InCreaseCount) },
+                        selectVisibility = productState.from == RESERVE_SCREEN,
+                        selectedCount = productState.selectedCount,
+                        total = productState.total
+                    )
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        EmptyView(
+                            text = stringResource(
+                                id =
+                                if (productState.subCategoryListState.isEmpty()) {
+                                    R.string.empty_product_list_view
+
+                                } else {
+                                    R.string.empty_product_list_view_for_sub_category
+                                }
+                            )
+                        )
+                    }
+                }
             }
         }
     )
@@ -172,7 +211,11 @@ fun SubCategoryList(
                 Spacer(modifier = Modifier.width(1.dp))
             }
             items(items.size) { index ->
-                SubCategoryListItem(selectedCategoryId = selectedCategoryId, item = items[index], onItemClick = onItemClick)
+                SubCategoryListItem(
+                    selectedCategoryId = selectedCategoryId,
+                    item = items[index],
+                    onItemClick = onItemClick
+                )
             }
             item {
                 Spacer(modifier = Modifier.width(1.dp))
@@ -183,17 +226,16 @@ fun SubCategoryList(
 
 @Composable
 fun SubCategoryListItem(
-    selectedCategoryId : Int,
+    selectedCategoryId: Int,
     item: SubMenuResponse,
     onItemClick: (Int) -> Unit
 ) {
-//    if (item.isSelected){
     Column(
         modifier = Modifier
             .clip(MaterialTheme.shapes.small)// clip to the circle shape
             .border(
                 1.dp,
-                if (item.isSelected) {
+                if (item.id == selectedCategoryId) {
                     MaterialTheme.colorScheme.primary
                 } else {
                     MaterialTheme.colorScheme.onPrimaryContainer
@@ -206,7 +248,7 @@ fun SubCategoryListItem(
                     .clickOnce { onItemClick(item.id) }
             }
     ) {
-        if (item.id == selectedCategoryId ) {
+        if (item.id == selectedCategoryId) {
             TextTitleSmallPrimary(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                 text = item.title
@@ -218,21 +260,6 @@ fun SubCategoryListItem(
             )
         }
     }
-//    }else{
-//        Column (
-//            modifier = Modifier
-//                .clip(MaterialTheme.shapes.small)// clip to the circle shape
-//                .border(1.dp, MaterialTheme.colorScheme.onPrimaryContainer, CircleShape)
-//                .clickable {
-//                    ClickHelper
-//                        .getInstance()
-//                        .clickOnce { onItemClick(item.id) }
-//                }
-//        ){
-//            TextTitleSmall(modifier = Modifier.padding(horizontal = 16.dp,vertical = 4.dp),text = item.title)
-//        }
-//
-//    }
 }
 
 @Composable
@@ -305,14 +332,28 @@ fun ProductGridItem(
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-                TextTitleMedium(text = "${item.price} T")
-                Spacer(modifier = Modifier.weight(1f))
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 TextTitleMedium(text = item.title)
+                Spacer(modifier = Modifier.height(8.dp))
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    Row(modifier = Modifier.fillMaxWidth()){
+                        TextTitleMediumPrimary(text = stringResource(id = R.string.price_is))
+                        Spacer(modifier = Modifier.weight(1.0f))
+                        TextTitleMedium(text = NumberFormat.getNumberInstance(Locale.US).format(item.price), modifier = Modifier.padding(end = 4.dp))
+                        TextTitleSmall(text = stringResource(id = R.string.toman))
+                    }
+                }
             }
             if (selectVisibility) {
-                Row(modifier = Modifier.padding(horizontal = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
                     IconButton(onClick = onDecrease) {
                         Image(

@@ -5,6 +5,7 @@ import com.example.cafebrown.data.repository.datasource.DeskRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.HomeRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.LoginRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.MenuRemoteDataSource
+import com.example.cafebrown.data.repository.datasource.ProductDetailRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ProductRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ProfileRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ReserveRemoteDataSource
@@ -14,6 +15,7 @@ import com.example.cafebrown.data.repository.datasourceImpl.DeskRemoteDataSource
 import com.example.cafebrown.data.repository.datasourceImpl.HomeDataRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.LoginRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.MenuRemoteDataSourceImpl
+import com.example.cafebrown.data.repository.datasourceImpl.ProductDetailRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.ProductRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.ProfileRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.TransactionRemoteDataSourceImpl
@@ -96,5 +98,13 @@ class RemoteDataModule {
     @Provides
     fun provideTransactionRemoteDataSource(apiService: APIService): TransactionRemoteDataSource {
         return TransactionRemoteDataSourceImpl(apiService)
+    }
+
+    @Singleton
+    @Provides
+    fun provideProductDetailRemoteDataSource(
+        apiService: APIService
+    ): ProductDetailRemoteDataSource {
+        return ProductDetailRemoteDataSourceImpl(apiService)
     }
 }

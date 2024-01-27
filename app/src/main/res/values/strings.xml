@@ -77,6 +77,7 @@
     <string name="wifi_pass">رمز وای فای :</string>
     <string name="desk_title">عنوان میز :</string>
     <string name="accept_rules">قوانین را قبول می کنم</string>
+    <string name="price_is">قیمت :</string>
 
     <string name="empty_view">در حال حاضر موردی برای نمایش وجود ندارد.</string>
     <string name="please_enter_your_mobile_number">لطفا برای ورود شماره موبایل خود را وارد کنید </string>
@@ -144,5 +145,8 @@
     <string name="enter_the_sent_code">کد ارسال شده به شماره موبایل %1$s را وارد نمایید .</string>
     <string name="expired_token">اطلاعات مربوط به کاربری شما منقضی شده است لطفا دوباره ورود کنید .</string>
     <string name="empty_menu_view">در حال حاضر موردی برای نمایش منو وجود ندارد.</string>
+    <string name="empty_product_list_view">متاسفانه در دسته بندی انتخاب شده محصولی وجود ندارد.</string>
+    <string name="empty_product_list_view_for_sub_category">متاسفانه در دسته بندی انتخاب شده محصولی وجود ندارد لطفا از منوی بالا مورد دیگری انتخاب نمایید.</string>
+    <string name="empty_comment_list">در حال حاضر نظری برای این محصول ثبت نشده است</string>
 
 </resources>

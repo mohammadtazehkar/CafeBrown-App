@@ -473,7 +473,23 @@ fun AppNavHost(
             }
         ) {
             ProductDetailScreen(
-                onNavUp = navController::navigateUp
+                onNavUp = navController::navigateUp,
+                onExpiredToken = {
+                    navController.navigate(SPLASH_SCREEN){
+                        popUpTo("$PRODUCT_DETAIL_SCREEN/{$PRODUCT_ID}/{$PRODUCT_TITLE}") {
+                            inclusive = true
+                        }
+                        popUpTo("$PRODUCT_LIST_SCREEN/{$CATEGORY_ID}/{$FROM}") {
+                            inclusive = true
+                        }
+                        popUpTo("$MENU_LIST_SCREEN/{$FROM}") {
+                            inclusive = true
+                        }
+                        popUpTo(HOME_SCREEN) {
+                            inclusive = true
+                        }
+                    }
+                },
             )
         }
         composable(

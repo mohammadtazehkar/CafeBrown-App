@@ -5,6 +5,7 @@ import com.example.cafebrown.data.repository.datasource.DeskRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.HomeRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.LoginRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.MenuRemoteDataSource
+import com.example.cafebrown.data.repository.datasource.ProductDetailRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ProductRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ProfileRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ReserveRemoteDataSource
@@ -15,6 +16,7 @@ import com.example.cafebrown.data.repository.repositoryImpl.DeskRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.HomeRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.LoginRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.MenuRepositoryImpl
+import com.example.cafebrown.data.repository.repositoryImpl.ProductDetailRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.ProductRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.ProfileRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.ReserveRepositoryImpl
@@ -25,6 +27,7 @@ import com.example.cafebrown.domain.repository.DeskRepository
 import com.example.cafebrown.domain.repository.HomeRepository
 import com.example.cafebrown.domain.repository.LoginRepository
 import com.example.cafebrown.domain.repository.MenuRepository
+import com.example.cafebrown.domain.repository.ProductDetailRepository
 import com.example.cafebrown.domain.repository.ProductRepository
 import com.example.cafebrown.domain.repository.ProfileRepository
 import com.example.cafebrown.domain.repository.ReserveRepository
@@ -168,6 +171,19 @@ class RepositoryModule {
     ): ReserveRepository{
         return ReserveRepositoryImpl(
             reserveRemoteDataSource,
+            appLocalDataSource,
+            networkUtil
+        )
+    }
+    @Singleton
+    @Provides
+    fun provideProductDetailRepository(
+        productDetailRemoteDataSource: ProductDetailRemoteDataSource,
+        appLocalDataSource: AppLocalDataSource,
+        networkUtil: NetworkUtil
+    ): ProductDetailRepository {
+        return ProductDetailRepositoryImpl(
+            productDetailRemoteDataSource,
             appLocalDataSource,
             networkUtil
         )

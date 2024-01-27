@@ -5,6 +5,8 @@ import com.example.cafebrown.data.models.menu.APIGetMenuResponse
 import com.example.cafebrown.data.models.product.APIGetSubMenuAndProductResponse
 import com.example.cafebrown.data.models.desk.APIGetDeskResponse
 import com.example.cafebrown.data.models.home.APIGetHomeDataResponse
+import com.example.cafebrown.data.models.productDetail.APIGetCommentResponse
+import com.example.cafebrown.data.models.productDetail.APIGetProductDetailResponse
 import com.example.cafebrown.data.models.profile.APIUpdateProfileRequest
 import com.example.cafebrown.data.models.transaction.APIGetUserTransactionsResponse
 import com.example.cafebrown.data.models.reserve.APIGetReserveBaseInfoResponse
@@ -13,9 +15,12 @@ import com.example.cafebrown.data.models.verify.APIPostVerificationCodeResponse
 import com.example.cafebrown.utils.ServerConstants.AUTHORIZATION
 import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_TRANSACTIONS
 import com.example.cafebrown.utils.ServerConstants.MENU_ID
+import com.example.cafebrown.utils.ServerConstants.PRODUCT_ID
 import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_MENU
 import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_SUB_MENU_AND_PRODUCT
 import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_COFFEE_SHOP_DATA
+import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_COMMENT
+import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_PRODUCT_DETAIL
 import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_RESERVE_TIMES
 import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_TABLES
 import com.example.cafebrown.utils.ServerConstants.SUB_URL_POST_VERIFICATION
@@ -65,4 +70,16 @@ interface APIService {
 
     @GET(SUB_URL_GET_RESERVE_TIMES)
     suspend fun getReserveTimes(@Header(AUTHORIZATION) token: String, @Query(TABLE_ID) tableId: Int): Response<APIGetReserveBaseInfoResponse>
+
+    @GET(SUB_URL_GET_PRODUCT_DETAIL)
+    suspend fun getProductDetail(
+        @Header(AUTHORIZATION) token: String,
+        @Query(PRODUCT_ID) productId: Int
+    ): Response<APIGetProductDetailResponse>
+
+    @GET(SUB_URL_GET_COMMENT)
+    suspend fun getComments(
+        @Header(AUTHORIZATION) token: String,
+        @Query(PRODUCT_ID) productId: Int
+    ): Response<APIGetCommentResponse>
 }

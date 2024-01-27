@@ -5,5 +5,6 @@ sealed class ProductListEvent{
     data object GetListFromServer: ProductListEvent()
     data object InCreaseCount: ProductListEvent()
     data object DeCreaseCount: ProductListEvent()
+    data class UpdateHasRunEffect(val status: Boolean): ProductListEvent()
 
 }

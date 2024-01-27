@@ -7,5 +7,4 @@ data class SubMenuResponse(
     val id: Int,
     @SerializedName("title")
     val title: String,
-    var isSelected: Boolean = false
 )

@@ -14,5 +14,6 @@ data class ProductListState(
     var from : String,
     var total: Int,
     var selectedCount: Int,
+    var hasRunEffect: Boolean = false,
     var response: Resource<APIGetSubMenuAndProductResponse>
 )
