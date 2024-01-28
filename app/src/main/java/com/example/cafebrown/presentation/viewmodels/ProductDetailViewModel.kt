@@ -1,13 +1,16 @@
 package com.example.cafebrown.presentation.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cafebrown.R
+import com.example.cafebrown.data.models.productDetail.APIPostCommentRequest
 import com.example.cafebrown.domain.usecase.GetCommentListUseCase
 import com.example.cafebrown.domain.usecase.GetProductDetailDataUseCase
+import com.example.cafebrown.domain.usecase.PostCommentUseCase
 import com.example.cafebrown.presentation.events.AppUIEvent
 import com.example.cafebrown.presentation.events.ProductDetailEvent
 import com.example.cafebrown.presentation.states.ProductDetailState
@@ -30,6 +33,7 @@ import javax.inject.Inject
 class ProductDetailViewModel @Inject constructor(
     private val getProductDetailDataUseCase: GetProductDetailDataUseCase,
     private val getCommentListUseCase: GetCommentListUseCase,
+    private val postCommentUseCase: PostCommentUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _productDetailState = mutableStateOf(
@@ -80,6 +84,9 @@ class ProductDetailViewModel @Inject constructor(
                     commentListDialogVisibility = event.status
                 )
             }
+            is ProductDetailEvent.PostComment ->{
+                postComment()
+            }
         }
     }
 
@@ -109,7 +116,7 @@ class ProductDetailViewModel @Inject constructor(
                 INTERNET_CONNECTION -> {
                     _uiEventFlow.emit(
                         AppUIEvent.ShowMessage(
-                            message = UIText.StringResource(R.string.connection_problem),
+                            message = UIText.StringResource(R.string.internet_connection_problem),
                             needAction = true
                         )
                     )
@@ -118,7 +125,7 @@ class ProductDetailViewModel @Inject constructor(
                 SERVER_CONNECTION -> {
                     _uiEventFlow.emit(
                         AppUIEvent.ShowMessage(
-                            message = UIText.StringResource(R.string.internet_connection_problem),
+                            message = UIText.StringResource(R.string.connection_problem),
                             needAction = true
                         )
                     )
@@ -143,14 +150,14 @@ class ProductDetailViewModel @Inject constructor(
             productInstruction = responseData.tutorial,
             imageList = responseData.productImageList
         )
-        if (responseData.rating != 0) {
-            prepareProductStars(responseData.rating - 1)
+        if (responseData.rating.toInt() != 0) {
+            prepareProductStars(responseData.rating.toInt() - 1)
         }
     }
 
     private fun prepareProductStars(starIndex: Int) {
-        _productDetailState.value.userStarsList.forEachIndexed { index, _ ->
-            _productDetailState.value.userStarsList[index].value = index <= starIndex
+        _productDetailState.value.productStarsList.forEachIndexed { index, _ ->
+            _productDetailState.value.productStarsList[index].value = index <= starIndex
         }
     }
 
@@ -167,7 +174,7 @@ class ProductDetailViewModel @Inject constructor(
                 BAD_REQUEST -> {
                     _uiEventFlow.emit(
                         AppUIEvent.ShowMessage(
-                            message = UIText.DynamicString(productDetailState.value.response.data?.message!!)
+                            message = UIText.DynamicString(productDetailState.value.responseCommentList.data?.message!!)
                         )
                     )
                 }
@@ -210,5 +217,72 @@ class ProductDetailViewModel @Inject constructor(
                 isLoading = false
             )
         }
+    }
+
+    private fun postComment(){
+        if (productDetailState.value.userComment.isEmpty()){
+            viewModelScope.launch {
+                _uiEventFlow.emit(
+                    AppUIEvent.ShowMessage(
+                        message = UIText.StringResource(R.string.empty_comment),
+                    )
+                )
+            }
+        }else{
+            val postCommentRequest = APIPostCommentRequest(
+                productDetailState.value.userComment,
+                productDetailState.value.userStarsList.count{it.value},
+                productDetailState.value.productId
+            )
+            _productDetailState.value = productDetailState.value.copy(
+                isLoading = true,
+                responsePostComment = Resource.Loading()
+            )
+            viewModelScope.launch {
+                _productDetailState.value = productDetailState.value.copy(
+                    responsePostComment = postCommentUseCase.execute(postCommentRequest)
+                )
+                when(productDetailState.value.responsePostComment.data?.status){
+                    BAD_REQUEST -> {
+                        _uiEventFlow.emit(
+                            AppUIEvent.ShowMessage(
+                                message = UIText.DynamicString(productDetailState.value.responsePostComment.data?.message!!)
+                            )
+                        )
+                    }
+                    SUCCESS -> {
+                        _uiEventFlow.emit(
+                            AppUIEvent.ShowMessage(
+                                message = UIText.StringResource(R.string.successfully_comment_posted),
+                                isError = false
+                            )
+                        )
+                    }
+                    INTERNET_CONNECTION -> {
+                        _uiEventFlow.emit(
+                            AppUIEvent.ShowMessage(
+                                message = UIText.StringResource(R.string.internet_connection_problem)
+                            )
+                        )
+                    }
+                    SERVER_CONNECTION -> {
+                        _uiEventFlow.emit(
+                            AppUIEvent.ShowMessage(
+                                message = UIText.StringResource(R.string.connection_problem)
+                            )
+                        )
+                    }
+                    EXPIRED_TOKEN -> {
+                        _uiEventFlow.emit(
+                            AppUIEvent.ExpiredToken
+                        )
+                    }
+                }
+                _productDetailState.value = productDetailState.value.copy(
+                    isLoading = false
+                )
+            }
+        }
+
     }
 }

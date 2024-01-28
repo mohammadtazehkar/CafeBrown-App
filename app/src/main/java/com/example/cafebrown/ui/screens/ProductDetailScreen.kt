@@ -76,9 +76,9 @@ fun ProductDetailScreen(
     val productDetailState = productDetailViewModel.productDetailState.value
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
+    val successSnackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
-        Log.i("mamali","firstLine of LaunchedEffect uiFlow is : ${productDetailViewModel.uiEventFlow}")
         productDetailViewModel.uiEventFlow.collect { event ->
             when (event) {
                 is AppUIEvent.ShowMessage -> {
@@ -99,7 +99,11 @@ fun ProductDetailScreen(
                         }
                     }
                     else {
-                        snackBarHostState.showSnackbar(message = event.message.asString(context))
+                        if (event.isError) {
+                            snackBarHostState.showSnackbar(message = event.message.asString(context))
+                        }else{
+                            successSnackBarHostState.showSnackbar(message = event.message.asString(context))
+                        }
                     }
                 }
 
@@ -114,15 +118,11 @@ fun ProductDetailScreen(
             }
         }
     }
-    DisposableEffect(Unit) {
+    LaunchedEffect(Unit){
         if (!productDetailState.hasRunEffect) {
             // Run your code here that you want to execute only once
             productDetailViewModel.onEvent(ProductDetailEvent.UpdateHasRunEffect(true))
             productDetailViewModel.onEvent(ProductDetailEvent.GetDataFromServer)
-        }
-
-        onDispose {
-            // Cleanup code, if needed
         }
     }
 
@@ -137,6 +137,7 @@ fun ProductDetailScreen(
             }
         )
     }
+
     Scaffold(
         topBar = {
             AppTopAppBar(
@@ -148,6 +149,9 @@ fun ProductDetailScreen(
         snackbarHost = {
             SnackbarHost(snackBarHostState) {
                 AppSnackBar(it)
+            }
+            SnackbarHost(successSnackBarHostState) {
+                AppSnackBar(it,false)
             }
         },
         content = { paddingValues ->
@@ -186,6 +190,9 @@ fun ProductDetailScreen(
                     },
                     onShowComment = {
                         productDetailViewModel.onEvent(ProductDetailEvent.GetCommentListFromServer)
+                    },
+                    onPostComment = {
+                        productDetailViewModel.onEvent(ProductDetailEvent.PostComment)
                     }
                 )
             }
@@ -215,7 +222,8 @@ fun ProductDetail(
     productInstruction: String,
     userComment: String,
     onUserCommentChange: (String) -> Unit,
-    onShowComment: () -> Unit
+    onShowComment: () -> Unit,
+    onPostComment: () -> Unit
 ) {
     Column(modifier = modifier) {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -280,7 +288,7 @@ fun ProductDetail(
             stringResource(id = R.string.send_comment_and_rate),
             true,
             onStarsClick,
-            {/*TODO*/}
+            onPostComment
         )
         Spacer(modifier = Modifier.height(16.dp))
     }

@@ -1,7 +1,9 @@
 package com.example.cafebrown.data.repository.repositoryImpl
 
+import com.example.cafebrown.data.models.APIGlobalResponse
 import com.example.cafebrown.data.models.productDetail.APIGetCommentResponse
 import com.example.cafebrown.data.models.productDetail.APIGetProductDetailResponse
+import com.example.cafebrown.data.models.productDetail.APIPostCommentRequest
 import com.example.cafebrown.data.repository.datasource.AppLocalDataSource
 import com.example.cafebrown.data.repository.datasource.ProductDetailRemoteDataSource
 import com.example.cafebrown.domain.repository.ProductDetailRepository
@@ -123,6 +125,61 @@ class ProductDetailRepositoryImpl (
                     INTERNET_CONNECTION,
                     null,
                     "No internet connection"
+                )
+            )
+        }
+    }
+
+    override suspend fun postComment(postCommentRequest: APIPostCommentRequest): Resource<APIGlobalResponse> {
+        return if (networkUtil.isInternetAvailable()) {
+            try {
+                val token = appLocalDataSource.getTokenFromDB()
+                val response = productDetailRemoteDataSource.postComment(
+                    token = "${ServerConstants.TOKEN_TYPE} $token",
+                    postCommentRequest = postCommentRequest
+                )
+                if (response.isSuccessful && response.body() != null) {
+                    Resource.Success(response.body()!!)
+                }
+                else {
+                    if (response.code() == EXPIRED_TOKEN){
+                        appLocalDataSource.deleteUserInfo()
+                        Resource.Error("expired Token",
+                            APIGlobalResponse(response.code(),
+                                "expired Token",
+                                null
+                            )
+                        )
+                    }
+                    else{
+                        Resource.Error(
+                            "An error occurred",
+                            APIGlobalResponse(
+                                SERVER_CONNECTION,
+                                "An error occurred",
+                                null
+                            )
+                        )
+                    }
+
+                }
+            } catch (e: Exception) {
+                Resource.Error(
+                    e.message ?: "An error occurred",
+                    APIGlobalResponse(
+                        SERVER_CONNECTION,
+                        "An error occurred",
+                        null
+                    )
+                )
+            }
+        } else {
+            Resource.Error(
+                "No internet connection",
+                APIGlobalResponse(
+                    INTERNET_CONNECTION,
+                    "No internet connection",
+                    null
                 )
             )
         }

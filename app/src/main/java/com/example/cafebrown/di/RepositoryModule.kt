@@ -8,6 +8,7 @@ import com.example.cafebrown.data.repository.datasource.MenuRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ProductDetailRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ProductRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ProfileRemoteDataSource
+import com.example.cafebrown.data.repository.datasource.ReserveHistoryRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ReserveRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.TransactionRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.VerifyRemoteDataSource
@@ -19,6 +20,7 @@ import com.example.cafebrown.data.repository.repositoryImpl.MenuRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.ProductDetailRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.ProductRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.ProfileRepositoryImpl
+import com.example.cafebrown.data.repository.repositoryImpl.ReserveHistoryRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.ReserveRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.TransactionRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.VerifyRepositoryImpl
@@ -30,6 +32,7 @@ import com.example.cafebrown.domain.repository.MenuRepository
 import com.example.cafebrown.domain.repository.ProductDetailRepository
 import com.example.cafebrown.domain.repository.ProductRepository
 import com.example.cafebrown.domain.repository.ProfileRepository
+import com.example.cafebrown.domain.repository.ReserveHistoryRepository
 import com.example.cafebrown.domain.repository.ReserveRepository
 import com.example.cafebrown.domain.repository.TransactionRepository
 import com.example.cafebrown.domain.repository.VerifyRepository
@@ -184,6 +187,19 @@ class RepositoryModule {
     ): ProductDetailRepository {
         return ProductDetailRepositoryImpl(
             productDetailRemoteDataSource,
+            appLocalDataSource,
+            networkUtil
+        )
+    }
+    @Singleton
+    @Provides
+    fun provideReserveHistoryRepository(
+        reserveHistoryRemoteDataSource: ReserveHistoryRemoteDataSource,
+        appLocalDataSource: AppLocalDataSource,
+        networkUtil: NetworkUtil
+    ): ReserveHistoryRepository {
+        return ReserveHistoryRepositoryImpl(
+            reserveHistoryRemoteDataSource,
             appLocalDataSource,
             networkUtil
         )

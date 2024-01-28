@@ -119,15 +119,11 @@ fun ProductListScreen(
             }
         }
     }
-    DisposableEffect(Unit) {
+    LaunchedEffect(Unit){
         if (!productState.hasRunEffect) {
             // Run your code here that you want to execute only once
             productListViewModel.onEvent(ProductListEvent.UpdateHasRunEffect(true))
             productListViewModel.onEvent(ProductListEvent.GetListFromServer)
-        }
-
-        onDispose {
-            // Cleanup code, if needed
         }
     }
 

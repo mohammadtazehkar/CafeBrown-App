@@ -12,7 +12,7 @@ data class GetProductDetailResponse(
     @SerializedName("description")
     val description: String,
     @SerializedName("rating")
-    val rating: Int,
+    val rating: Double,
     @SerializedName("maxOfferCount")
     val maxOfferCount: Int,
     @SerializedName("tutorial")

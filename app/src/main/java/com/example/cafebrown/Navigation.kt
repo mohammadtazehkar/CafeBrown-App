@@ -611,7 +611,17 @@ fun AppNavHost(
                 onNavigateToReserve = {
                     navController.navigate(RESERVE_SCREEN)
                 },
-                onNavUp = navController::navigateUp
+                onNavUp = navController::navigateUp,
+                onExpiredToken = {
+                    navController.navigate(SPLASH_SCREEN){
+                        popUpTo(RESERVE_HISTORY_SCREEN) {
+                            inclusive = true
+                        }
+                        popUpTo(HOME_SCREEN) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
 

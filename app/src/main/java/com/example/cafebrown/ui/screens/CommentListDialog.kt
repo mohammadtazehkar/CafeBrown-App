@@ -85,9 +85,11 @@ fun CommentListItem(
             TextTitleMedium(text = item.user)
         }
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl){
-            TextTitleSmall(text = item.text, textAlign = TextAlign.Justify)
+            Row(modifier = Modifier.fillMaxWidth().padding(top = 16.dp), horizontalArrangement = Arrangement.Start) {
+                TextTitleSmall(text = item.text, textAlign = TextAlign.Justify)
+            }
         }
-        TextTitleMedium(text = item.dateTime, textAlign = TextAlign.Start)
+        TextTitleMedium(modifier = Modifier.padding(top = 16.dp) ,text = item.dateTime, textAlign = TextAlign.Start)
         Divider()
     }
 }
@@ -104,8 +106,6 @@ fun CommentItemStarsRow(
         }
     }
 
-//    val imagePainter1: Painter = painterResource(id = R.mipmap.ic_star_fill)
-//    val imagePainter2: Painter = painterResource(id = R.mipmap.ic_star_empty)
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.Start,
@@ -123,7 +123,7 @@ fun CommentItemStarsRow(
                 ) ,
                 contentDescription = null,
                 modifier = Modifier
-                    .size(32.dp)
+                    .size(24.dp)
             )
         }
     }

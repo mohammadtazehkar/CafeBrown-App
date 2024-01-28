@@ -7,5 +7,6 @@ sealed class ProductDetailEvent{
     data class UpdateHasRunEffect(val status: Boolean): ProductDetailEvent()
     data class UpdateCommentDialogVisibility(val status: Boolean): ProductDetailEvent()
     data object GetCommentListFromServer: ProductDetailEvent()
+    data object PostComment: ProductDetailEvent()
 
 }

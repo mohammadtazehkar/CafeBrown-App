@@ -148,5 +148,6 @@
     <string name="empty_product_list_view">متاسفانه در دسته بندی انتخاب شده محصولی وجود ندارد.</string>
     <string name="empty_product_list_view_for_sub_category">متاسفانه در دسته بندی انتخاب شده محصولی وجود ندارد لطفا از منوی بالا مورد دیگری انتخاب نمایید.</string>
     <string name="empty_comment_list">در حال حاضر نظری برای این محصول ثبت نشده است</string>
+    <string name="empty_reserve_history_view">در حال حاضر سابقه رزرو برای نمایش وجود ندارد، لطفا برای رزرو از صفحه ی اصلی ، منوی رزرو میز و سفارش را انتخاب نمایید .</string>
 
 </resources>

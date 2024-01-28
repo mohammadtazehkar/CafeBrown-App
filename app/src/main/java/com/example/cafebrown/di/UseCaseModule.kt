@@ -8,6 +8,7 @@ import com.example.cafebrown.domain.repository.MenuRepository
 import com.example.cafebrown.domain.repository.ProductDetailRepository
 import com.example.cafebrown.domain.repository.ProductRepository
 import com.example.cafebrown.domain.repository.ProfileRepository
+import com.example.cafebrown.domain.repository.ReserveHistoryRepository
 import com.example.cafebrown.domain.repository.ReserveRepository
 import com.example.cafebrown.domain.repository.TransactionRepository
 import com.example.cafebrown.domain.repository.VerifyRepository
@@ -20,7 +21,9 @@ import com.example.cafebrown.domain.usecase.GetProductDetailDataUseCase
 import com.example.cafebrown.domain.usecase.GetProfileDataUseCase
 import com.example.cafebrown.domain.usecase.GetSubMenuAndProductListUseCase
 import com.example.cafebrown.domain.usecase.GetReserveBaseInfoUseCase
+import com.example.cafebrown.domain.usecase.GetReserveHistoryListUseCase
 import com.example.cafebrown.domain.usecase.GetTransactionListUseCase
+import com.example.cafebrown.domain.usecase.PostCommentUseCase
 import com.example.cafebrown.domain.usecase.PostMobileUseCase
 import com.example.cafebrown.domain.usecase.PostVerificationCodeUseCase
 import com.example.cafebrown.domain.usecase.UpdateProfileDataUseCase
@@ -135,6 +138,22 @@ class UseCaseModule {
         productDetailRepository: ProductDetailRepository
     ): GetCommentListUseCase {
         return GetCommentListUseCase(productDetailRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun providePostCommentUseCase(
+        productDetailRepository: ProductDetailRepository
+    ): PostCommentUseCase {
+        return PostCommentUseCase(productDetailRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGetReserveHistoryListUseCase(
+        reserveHistoryRepository: ReserveHistoryRepository
+    ): GetReserveHistoryListUseCase {
+        return GetReserveHistoryListUseCase(reserveHistoryRepository)
     }
 
 }
