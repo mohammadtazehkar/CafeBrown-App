@@ -73,7 +73,7 @@ interface APIService {
     ): Response<APIGetReserveBaseInfoResponse>
 
     @POST(SUB_URL_POST_INCREASE_BALANCE)
-    fun postIncreaseBalance(
+    suspend fun postIncreaseBalance(
         @Header(AUTHORIZATION) token: String,
         @Body apiPostIncreaseBalanceRequest: APIPostIncreaseBalanceRequest
     ): Response<APIGlobalResponse>

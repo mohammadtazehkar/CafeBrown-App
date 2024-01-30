@@ -7,13 +7,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +29,6 @@ import androidx.compose.material3.SnackbarResult.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +40,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cafebrown.R
@@ -46,8 +51,8 @@ import com.example.cafebrown.presentation.events.TransactionEvent
 import com.example.cafebrown.presentation.viewmodels.TransactionViewModel
 import com.example.cafebrown.ui.components.AppSnackBar
 import com.example.cafebrown.ui.components.AppTopAppBar
+import com.example.cafebrown.ui.components.EmptyView
 import com.example.cafebrown.ui.components.MainBox
-import com.example.cafebrown.ui.components.MainColumn
 import com.example.cafebrown.ui.components.ProgressBarDialog
 import com.example.cafebrown.ui.components.TextTitleMedium
 import com.example.cafebrown.ui.components.TextTitleSmall
@@ -55,8 +60,11 @@ import com.example.cafebrown.ui.theme.AppTheme
 import com.example.cafebrown.utils.ClickHelper
 import com.example.cafebrown.utils.UIText
 import kotlinx.coroutines.delay
+import java.text.NumberFormat
+import java.util.Locale
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TransactionScreen(
     transactionViewModel: TransactionViewModel = hiltViewModel(),
@@ -64,7 +72,12 @@ fun TransactionScreen(
     onExpiredToken: () -> Unit
 ) {
     val context = LocalContext.current
+    var transactionState = transactionViewModel.transactionState.value
 
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = transactionState.isLoading,
+        onRefresh = { transactionViewModel.onEvent(TransactionEvent.GetTransactionListFromServer) }
+    )
     val snackbarHostState = remember { SnackbarHostState() }
     val successSnackbarHostState = remember { SnackbarHostState() }
 
@@ -77,21 +90,21 @@ fun TransactionScreen(
                             message = uiEvent.message.asString(context),
                             duration = SnackbarDuration.Short
                         )
-                        return@collect
-                    }
-                    val result =
-                        snackbarHostState.showSnackbar(
+                        //return@collect
+                    } else {
+                        val result = snackbarHostState.showSnackbar(
                             message = uiEvent.message.asString(context),
                             actionLabel = UIText.StringResource(R.string.try_again)
                                 .asString(context),
                             duration = SnackbarDuration.Indefinite
                         )
-                    when (result) {
-                        ActionPerformed -> {
-                            transactionViewModel.onEvent(TransactionEvent.GetTransactionListFromServer)
-                        }
+                        when (result) {
+                            ActionPerformed -> {
+                                transactionViewModel.onEvent(TransactionEvent.GetTransactionListFromServer)
+                            }
 
-                        Dismissed -> {}
+                            Dismissed -> {}
+                        }
                     }
                 }
 
@@ -111,31 +124,25 @@ fun TransactionScreen(
         transactionViewModel.onEvent(TransactionEvent.GetTransactionListFromServer)
     }
 
-    if (transactionViewModel.transactionState.value.isLoading) {
+    if (transactionState.isLoading) {
         ProgressBarDialog()
     }
 
-    var transactionState = transactionViewModel.transactionState.value
     if (transactionState.isDialogVisible) {
-        IncreaseBalanceDialog(
-            balance = transactionState.balance.toString(),
-            onDismissRequest = {
-                transactionViewModel.onEvent(TransactionEvent.ChangeDialogVisibility(false))
-            },
-            onConfirmation = {
-                transactionViewModel.onEvent(
-                    TransactionEvent.ChangeDialogVisibility(false)
+        IncreaseBalanceDialog(balance = transactionState.balance.toString(), onDismissRequest = {
+            transactionViewModel.onEvent(TransactionEvent.ChangeDialogVisibility(false))
+        }, onConfirmation = {
+            transactionViewModel.onEvent(
+                TransactionEvent.ChangeDialogVisibility(false)
+            )
+            transactionViewModel.onEvent(TransactionEvent.PostIncreaseBalanceToServer)
+        }, onChangeBalance = { newVal ->
+            transactionViewModel.onEvent(
+                TransactionEvent.ChangeIncreaseBalanceTextField(
+                    newVal
                 )
-                transactionViewModel.onEvent(TransactionEvent.PostIncreaseBalanceToServer)
-            },
-            onChangeBalance = { newVal ->
-                transactionViewModel.onEvent(
-                    TransactionEvent.ChangeIncreaseBalanceTextField(
-                        newVal
-                    )
-                )
-            },
-            increaseBalance = transactionState.increaseBalance
+            )
+        }, increaseBalance = transactionState.increaseBalance
         )
     }
 
@@ -150,29 +157,57 @@ fun TransactionScreen(
             AppSnackBar(it)
         }
         SnackbarHost(successSnackbarHostState) {
-            AppSnackBar(it,true)
+            AppSnackBar(it,false)
         }
     }) {
-        MainColumn() {
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(2.0F)
-                    .padding(it), columns = GridCells.Fixed(2)
+        MainBox(modifier = Modifier
+            .padding(it)
+            .pullRefresh(pullRefreshState)) {
+            ConstraintLayout(
+                modifier = Modifier.fillMaxSize()
             ) {
-                items(count = transactionState.transactionList.size) { index ->
-                    TransactionGridItem(
-                        transactionData = transactionState.transactionList[index],
-                        shouldShowDivider = index % 2 == 0
-                    )
+                val (emptyColumn, lazyGrid, bottomBar) = createRefs()
+                if (transactionState.transactionList.size == 0) {
+                    Column(modifier = Modifier.constrainAs(emptyColumn) {
+                        centerVerticallyTo(parent)
+                        centerHorizontallyTo(parent)
+                    }) {
+                        EmptyView(text = stringResource(id = R.string.empty_view))
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier.constrainAs(lazyGrid) {
+                            top.linkTo(parent.top)
+                            bottom.linkTo(bottomBar.top)
+                            height = Dimension.fillToConstraints
+                        }
+                    ) {
+                        items(count = transactionState.transactionList.size) { index ->
+                            TransactionGridItem(
+                                transactionData = transactionState.transactionList[index],
+                                shouldShowDivider = index % 2 == 0
+                            )
+                        }
+                    }
                 }
+                TransactionBottomBar(
+//                    Modifier.align(Alignment.BottomCenter),
+                    Modifier.constrainAs(bottomBar) {
+                        bottom.linkTo(parent.bottom)
+                    },
+                    transactionState.balance.toString(),
+                    {
+                        transactionViewModel.onEvent(
+                            TransactionEvent.ChangeDialogVisibility(true)
+                        )
+                    })
             }
-
-            TransactionBottomBar(transactionState.balance.toString(), {
-                transactionViewModel.onEvent(
-                    TransactionEvent.ChangeDialogVisibility(true)
-                )
-            })
+            PullRefreshIndicator(
+                refreshing = transactionState.isLoading,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter),
+            )
         }
 
     }
@@ -196,19 +231,19 @@ fun TransactionGridItem(
             Image(
                 modifier = Modifier
                     .padding(vertical = 8.dp)
-                    .size(64.dp),
-                painter = painterResource(
+                    .size(64.dp), painter = painterResource(
                     id = when (transactionData.transactionTypeId) {
                         0 -> R.mipmap.ic_wallet
                         1 -> R.mipmap.ic_transaction
                         else -> R.mipmap.ic_wallet
                     }
-                ),
-                contentDescription = transactionData.transactionType
+                ), contentDescription = transactionData.transactionType
             )
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 TextTitleMedium(
-                    text = "${transactionData.amount} ${stringResource(id = R.string.toman)}",
+                    text = "${
+                        NumberFormat.getNumberInstance(Locale.US).format(transactionData.amount)
+                    } ${stringResource(id = R.string.toman)}",
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
@@ -235,15 +270,19 @@ fun TransactionGridItem(
 }
 
 @Composable
-fun TransactionBottomBar(price: String, onClick: () -> Unit) {
+fun TransactionBottomBar(modifier: Modifier, price: String, onClick: () -> Unit) {
 //    val context = LocalContext.current
     Row(
-        modifier = Modifier.background(MaterialTheme.colorScheme.background),
+        modifier = modifier.background(MaterialTheme.colorScheme.background),
         verticalAlignment = Alignment.CenterVertically
     ) {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             TextTitleMedium(
-                text = "${price} ${stringResource(id = R.string.toman)}",
+                text = "${NumberFormat.getNumberInstance(Locale.US).format(price.toLong())} ${
+                    stringResource(
+                        id = R.string.toman
+                    )
+                }",
                 modifier = Modifier
                     .weight(2.0F)
                     .padding(8.dp),

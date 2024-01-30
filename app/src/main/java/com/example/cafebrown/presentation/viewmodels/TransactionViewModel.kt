@@ -109,10 +109,12 @@ class TransactionViewModel @Inject constructor(
                             isError = false
                         )
                     )
-                    val finalBalance =
-                        _transactionState.value.balance?.plus(_transactionState.value.increaseBalance.toLong())
-                    _transactionState.value =
-                        transactionState.value.copy(balance = finalBalance)
+                    _transactionState.value = transactionState.value.copy(increaseBalance = "")
+//                    val finalBalance =
+//                        _transactionState.value.balance?.plus(_transactionState.value.increaseBalance.toLong())
+//                    _transactionState.value =
+//                        transactionState.value.copy(balance = finalBalance)
+                    getTransactionList()
                 }
 
                 INTERNET_CONNECTION -> {
