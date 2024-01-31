@@ -1,5 +1,6 @@
 package com.example.cafebrown.di
 
+import com.example.cafebrown.data.repository.datasource.AboutUsRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.AppLocalDataSource
 import com.example.cafebrown.data.repository.datasource.DeskRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.HomeRemoteDataSource
@@ -10,6 +11,7 @@ import com.example.cafebrown.data.repository.datasource.ProfileRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.ReserveRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.TransactionRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.VerifyRemoteDataSource
+import com.example.cafebrown.data.repository.repositoryImpl.AboutUsRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.CheckUserDataRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.DeskRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.HomeRepositoryImpl
@@ -20,6 +22,7 @@ import com.example.cafebrown.data.repository.repositoryImpl.ProfileRepositoryImp
 import com.example.cafebrown.data.repository.repositoryImpl.ReserveRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.TransactionRepositoryImpl
 import com.example.cafebrown.data.repository.repositoryImpl.VerifyRepositoryImpl
+import com.example.cafebrown.domain.repository.AboutUsRepository
 import com.example.cafebrown.domain.repository.CheckUserDataRepository
 import com.example.cafebrown.domain.repository.DeskRepository
 import com.example.cafebrown.domain.repository.HomeRepository
@@ -168,6 +171,20 @@ class RepositoryModule {
     ): ReserveRepository{
         return ReserveRepositoryImpl(
             reserveRemoteDataSource,
+            appLocalDataSource,
+            networkUtil
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideAboutUsRepository(
+        aboutUsRemoteDataSource: AboutUsRemoteDataSource,
+        appLocalDataSource: AppLocalDataSource,
+        networkUtil: NetworkUtil
+    ): AboutUsRepository {
+        return AboutUsRepositoryImpl(
+            aboutUsRemoteDataSource,
             appLocalDataSource,
             networkUtil
         )

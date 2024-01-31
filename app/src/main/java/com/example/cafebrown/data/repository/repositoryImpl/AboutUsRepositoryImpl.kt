@@ -1,45 +1,43 @@
 package com.example.cafebrown.data.repository.repositoryImpl
 
 import com.example.cafebrown.data.models.APIGlobalResponse
-import com.example.cafebrown.data.models.transaction.APIGetUserTransactionsResponse
-import com.example.cafebrown.data.models.transaction.APIPostIncreaseBalanceRequest
+import com.example.cafebrown.data.models.aboutUs.APIGetCoffeeShopDataResponse
+import com.example.cafebrown.data.models.aboutUs.APIPostComplaintsRequest
+import com.example.cafebrown.data.repository.datasource.AboutUsRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.AppLocalDataSource
-import com.example.cafebrown.data.repository.datasource.TransactionRemoteDataSource
-import com.example.cafebrown.domain.repository.TransactionRepository
-import com.example.cafebrown.utils.JSonStatusCode.EXPIRED_TOKEN
-import com.example.cafebrown.utils.JSonStatusCode.INTERNET_CONNECTION
-import com.example.cafebrown.utils.JSonStatusCode.SERVER_CONNECTION
+import com.example.cafebrown.domain.repository.AboutUsRepository
+import com.example.cafebrown.utils.JSonStatusCode
 import com.example.cafebrown.utils.NetworkUtil
 import com.example.cafebrown.utils.Resource
-import com.example.cafebrown.utils.ServerConstants.TOKEN_TYPE
+import com.example.cafebrown.utils.ServerConstants
 
-class TransactionRepositoryImpl(
-    val transactionRemoteDataSource: TransactionRemoteDataSource,
+class AboutUsRepositoryImpl(
+    val aboutUsRemoteDataSource: AboutUsRemoteDataSource,
     val appLocalDataSource: AppLocalDataSource,
     val networkUtil: NetworkUtil
-) : TransactionRepository {
-    override suspend fun getTransactionList(): Resource<APIGetUserTransactionsResponse> {
+) : AboutUsRepository {
+    override suspend fun getCoffeeShopData(): Resource<APIGetCoffeeShopDataResponse> {
         return if (networkUtil.isInternetAvailable()) {
             try {
                 val token = appLocalDataSource.getTokenFromDB()
-                val response = transactionRemoteDataSource.getTransactionList(
-                    token = "$TOKEN_TYPE $token"
+                val response = aboutUsRemoteDataSource.getCoffeeShopData(
+                    token = "${ServerConstants.TOKEN_TYPE} $token"
                 )
                 if (response.isSuccessful && response.body() != null) {
                     Resource.Success(response.body()!!)
                 } else {
-                    if (response.code() == EXPIRED_TOKEN) {
+                    if (response.code() == JSonStatusCode.EXPIRED_TOKEN) {
                         appLocalDataSource.deleteUserInfo()
                         Resource.Error(
-                            "expired Token", APIGetUserTransactionsResponse(
+                            "expired Token", APIGetCoffeeShopDataResponse(
                                 response.code(), null, "expired Token"
                             )
                         )
 
                     } else {
                         Resource.Error(
-                            "An error occurred", APIGetUserTransactionsResponse(
-                                SERVER_CONNECTION, null, "An error occurred"
+                            "An error occurred", APIGetCoffeeShopDataResponse(
+                                JSonStatusCode.SERVER_CONNECTION, null, "An error occurred"
                             )
                         )
                     }
@@ -47,31 +45,31 @@ class TransactionRepositoryImpl(
                 }
             } catch (e: Exception) {
                 Resource.Error(
-                    e.message ?: "An error occurred", APIGetUserTransactionsResponse(
-                        SERVER_CONNECTION, null, "An error occurred"
+                    e.message ?: "An error occurred", APIGetCoffeeShopDataResponse(
+                        JSonStatusCode.SERVER_CONNECTION, null, "An error occurred"
                     )
                 )
             }
         } else {
             Resource.Error(
-                "No internet connection", APIGetUserTransactionsResponse(
-                    INTERNET_CONNECTION, null, "No internet connection"
+                "No internet connection", APIGetCoffeeShopDataResponse(
+                    JSonStatusCode.INTERNET_CONNECTION, null, "No internet connection"
                 )
             )
         }
     }
 
-    override suspend fun postIncreaseBalance(increaseBalanceObject: APIPostIncreaseBalanceRequest): Resource<APIGlobalResponse> {
+    override suspend fun postComplaints(apiPostComplaintsRequest: APIPostComplaintsRequest): Resource<APIGlobalResponse> {
         return if (networkUtil.isInternetAvailable()) {
             try {
                 val token = appLocalDataSource.getTokenFromDB()
-                val response = transactionRemoteDataSource.postIncreaseBalance(
-                    "$TOKEN_TYPE $token", increaseBalanceObject
+                val response = aboutUsRemoteDataSource.postComplaints(
+                    "${ServerConstants.TOKEN_TYPE} $token", apiPostComplaintsRequest
                 )
                 if (response.isSuccessful && response.body() != null) {
                     Resource.Success(response.body()!!)
                 } else {
-                    if (response.code() == EXPIRED_TOKEN) {
+                    if (response.code() == JSonStatusCode.EXPIRED_TOKEN) {
                         appLocalDataSource.deleteUserInfo()
                         Resource.Error(
                             "expired Token", APIGlobalResponse(
@@ -82,7 +80,7 @@ class TransactionRepositoryImpl(
                     } else {
                         Resource.Error(
                             "An error occurred", APIGlobalResponse(
-                                SERVER_CONNECTION, "", "An error occurred"
+                                JSonStatusCode.SERVER_CONNECTION, "", "An error occurred"
                             )
                         )
                     }
@@ -91,14 +89,14 @@ class TransactionRepositoryImpl(
             } catch (e: Exception) {
                 Resource.Error(
                     e.message ?: "An error occurred", APIGlobalResponse(
-                        SERVER_CONNECTION, "", "An error occurred"
+                        JSonStatusCode.SERVER_CONNECTION, "", "An error occurred"
                     )
                 )
             }
         } else {
             Resource.Error(
                 "No internet connection", APIGlobalResponse(
-                    INTERNET_CONNECTION, "", "No internet connection"
+                    JSonStatusCode.INTERNET_CONNECTION, "", "No internet connection"
                 )
             )
         }
