@@ -46,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cafebrown.R
 import com.example.cafebrown.data.models.transaction.UserTransactionsData
+import com.example.cafebrown.presentation.events.AboutUsEvent
 import com.example.cafebrown.presentation.events.AppUIEvent
 import com.example.cafebrown.presentation.events.TransactionEvent
 import com.example.cafebrown.presentation.viewmodels.TransactionViewModel
@@ -100,7 +101,10 @@ fun TransactionScreen(
                         )
                         when (result) {
                             ActionPerformed -> {
-                                transactionViewModel.onEvent(TransactionEvent.GetTransactionListFromServer)
+                                if (transactionState.isIncreaseBalanceRequest)
+                                    transactionViewModel.onEvent(TransactionEvent.PostIncreaseBalanceToServer)
+                                else
+                                    transactionViewModel.onEvent(TransactionEvent.GetTransactionListFromServer)
                             }
 
                             Dismissed -> {}
@@ -157,12 +161,14 @@ fun TransactionScreen(
             AppSnackBar(it)
         }
         SnackbarHost(successSnackbarHostState) {
-            AppSnackBar(it,false)
+            AppSnackBar(it, false)
         }
     }) {
-        MainBox(modifier = Modifier
-            .padding(it)
-            .pullRefresh(pullRefreshState)) {
+        MainBox(
+            modifier = Modifier
+                .padding(it)
+                .pullRefresh(pullRefreshState)
+        ) {
             ConstraintLayout(
                 modifier = Modifier.fillMaxSize()
             ) {

@@ -80,7 +80,7 @@ class TransactionViewModel @Inject constructor(
 
     private fun postIncreaseBalance() {
         _transactionState.value =
-            transactionState.value.copy(isLoading = true, responsePost = Resource.Loading())
+            transactionState.value.copy(isIncreaseBalanceRequest = true,isLoading = true, responsePost = Resource.Loading())
         viewModelScope.launch {
             _transactionState.value = transactionState.value.copy(
                 responsePost = postIncreaseBalanceUseCase.execute(
@@ -109,7 +109,7 @@ class TransactionViewModel @Inject constructor(
                             isError = false
                         )
                     )
-                    _transactionState.value = transactionState.value.copy(increaseBalance = "")
+                    _transactionState.value = transactionState.value.copy(isIncreaseBalanceRequest = false,increaseBalance = "")
 //                    val finalBalance =
 //                        _transactionState.value.balance?.plus(_transactionState.value.increaseBalance.toLong())
 //                    _transactionState.value =

@@ -640,7 +640,16 @@ fun AppNavHost(
             }
         ) {
             AboutUsScreen(
-                onNavUp = navController::navigateUp
+                onNavUp = navController::navigateUp, onExpiredToken = {
+                    navController.navigate(SPLASH_SCREEN) {
+                        popUpTo(ABOUT_US_SCREEN) {
+                            inclusive = true
+                        }
+                        popUpTo(HOME_SCREEN) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
     }

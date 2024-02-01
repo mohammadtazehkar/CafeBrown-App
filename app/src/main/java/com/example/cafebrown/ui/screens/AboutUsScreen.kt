@@ -2,6 +2,7 @@ package com.example.cafebrown.ui.screens
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,9 +17,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -32,21 +39,81 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.cafebrown.R
 import com.example.cafebrown.presentation.events.AboutUsEvent
+import com.example.cafebrown.presentation.events.AppUIEvent
+import com.example.cafebrown.presentation.events.TransactionEvent
 import com.example.cafebrown.presentation.viewmodels.AboutUsViewModel
+import com.example.cafebrown.ui.components.AppSnackBar
 import com.example.cafebrown.ui.components.AppTopAppBar
 import com.example.cafebrown.ui.components.MainColumn
+import com.example.cafebrown.ui.components.ProgressBarDialog
 import com.example.cafebrown.ui.components.TextTitleLarge
 import com.example.cafebrown.ui.components.TextTitleMedium
 import com.example.cafebrown.ui.components.TextTitleMediumPrimary
 import com.example.cafebrown.ui.theme.AppTheme
 import com.example.cafebrown.utils.ClickHelper
+import com.example.cafebrown.utils.UIText
+import kotlinx.coroutines.delay
 
 @Composable
-fun AboutUsScreen(aboutUsViewModel: AboutUsViewModel = viewModel(), onNavUp: () -> Unit) {
+fun AboutUsScreen(
+    aboutUsViewModel: AboutUsViewModel = hiltViewModel(),
+    onNavUp: () -> Unit,
+    onExpiredToken: () -> Unit
+) {
+    val context = LocalContext.current
     val aboutUsState = aboutUsViewModel.aboutUsState.value
+    val snackbarHostState = remember { SnackbarHostState() }
+    val successSnackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(key1 = true) {
+        aboutUsViewModel.aboutUsSharedFlow.collect { appUIEvent ->
+            when (appUIEvent) {
+                AppUIEvent.ExpiredToken -> {
+                    snackbarHostState.showSnackbar(
+                        message = UIText.StringResource(resId = R.string.expired_token)
+                            .asString(context)
+                    )
+                    delay(500)
+                    onExpiredToken()
+                }
+
+                is AppUIEvent.ShowMessage -> {
+                    if (!appUIEvent.isError) {
+                        successSnackbarHostState.showSnackbar(
+                            message = appUIEvent.message.asString(context),
+                            duration = SnackbarDuration.Short
+                        )
+                        //return@collect
+                    } else {
+                        val result = snackbarHostState.showSnackbar(
+                            message = appUIEvent.message.asString(context),
+                            actionLabel = UIText.StringResource(R.string.try_again)
+                                .asString(context),
+                            duration = SnackbarDuration.Indefinite
+                        )
+                        when (result) {
+                            SnackbarResult.ActionPerformed -> {
+                                if (aboutUsState.isComplaintsRequest) aboutUsViewModel.onEvent(
+                                    AboutUsEvent.PostComplaintsToServer
+                                )
+                                else aboutUsViewModel.onEvent(AboutUsEvent.GetCoffeeShopDataFromServer)
+                            }
+
+                            SnackbarResult.Dismissed -> {}
+                        }
+                    }
+                }
+            }
+        }
+    }
+    LaunchedEffect(key1 = Unit) {
+        aboutUsViewModel.onEvent(AboutUsEvent.GetCoffeeShopDataFromServer)
+    }
+
     if (aboutUsState.rulesDialogVisibility) {
         RulesDialog(onDismissRequest = {
             aboutUsViewModel.onEvent(
@@ -71,17 +138,27 @@ fun AboutUsScreen(aboutUsViewModel: AboutUsViewModel = viewModel(), onNavUp: () 
                         false
                     )
                 )
+                aboutUsViewModel.onEvent(AboutUsEvent.PostComplaintsToServer)
             },
             onChangeComplaint = { aboutUsViewModel.onEvent(AboutUsEvent.ChangeComplaintData(it)) },
             complaintText = aboutUsState.complaintData
         )
     }
+    if (aboutUsState.isLoading) {
+        ProgressBarDialog()
+    }
+
     Scaffold(topBar = {
         AppTopAppBar(
-            title = stringResource(id = R.string.about_us),
-            isBackVisible = true,
-            onBack = onNavUp
+            title = stringResource(id = R.string.about_us), isBackVisible = true, onBack = onNavUp
         )
+    }, snackbarHost = {
+        SnackbarHost(snackbarHostState) {
+            AppSnackBar(it)
+        }
+        SnackbarHost(successSnackbarHostState) {
+            AppSnackBar(it, false)
+        }
     }) {
         MainColumn(
             modifier = Modifier
@@ -91,9 +168,9 @@ fun AboutUsScreen(aboutUsViewModel: AboutUsViewModel = viewModel(), onNavUp: () 
                 .verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.Top
         ) {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                AboutCafe(aboutUsState.aboutCafe.asString())
+                AboutCafe(aboutUsState.aboutCafe)
                 Divider(modifier = Modifier.padding(top = 8.dp), thickness = 3.dp)
-                CafeAddress(aboutUsState.cafeAddress.asString())
+                CafeAddress(aboutUsState.cafeAddress)
                 Divider(modifier = Modifier.padding(top = 8.dp), thickness = 3.dp)
                 SupportCafe(
                     aboutUsState.cafePhone, aboutUsState.cafeTelegram, aboutUsState.cafeInstagram
@@ -329,6 +406,6 @@ fun AboutCompany() {
 @Composable
 fun previewAboutUs() {
     AppTheme {
-        AboutUsScreen(viewModel(), {})
+        AboutUsScreen(viewModel(), {}, {})
     }
 }

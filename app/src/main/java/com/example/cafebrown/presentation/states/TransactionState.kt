@@ -12,5 +12,7 @@ data class TransactionState(
     var transactionList: MutableList<UserTransactionsData> = mutableListOf(),
     var isLoading: Boolean = false,
     var response: Resource<APIGetUserTransactionsResponse> = Resource.Error(""),
-    var responsePost : Resource<APIGlobalResponse> = Resource.Error("")
+    var responsePost : Resource<APIGlobalResponse> = Resource.Error(""),
+    var isIncreaseBalanceRequest: Boolean = false // for knowing which request is active right now
+
 )
