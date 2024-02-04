@@ -1,5 +1,6 @@
 package com.example.cafebrown.data.repository.repositoryImpl
 
+import android.util.Log
 import com.example.cafebrown.data.models.APIGlobalResponse
 import com.example.cafebrown.data.models.home.APIGetHomeDataResponse
 import com.example.cafebrown.data.repository.datasource.AppLocalDataSource
@@ -22,6 +23,7 @@ class HomeRepositoryImpl(
         return if (networkUtil.isInternetAvailable()) {
             try {
                 val token = appLocalDataSource.getTokenFromDB()
+                Log.i("Meyti", token)
                 val response = homeRemoteDataSource.getHomeData("${ServerConstants.TOKEN_TYPE} $token")
                 if (response.isSuccessful && response.body() != null) {
                     Resource.Success(response.body()!!)

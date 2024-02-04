@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
@@ -41,6 +42,7 @@ import com.example.cafebrown.presentation.events.DeskListEvent
 import com.example.cafebrown.presentation.events.ReserveEvent
 import com.example.cafebrown.presentation.viewmodels.ReserveViewModel
 import com.example.cafebrown.ui.components.AppDatePicker
+import com.example.cafebrown.ui.components.AppSnackBar
 import com.example.cafebrown.ui.components.AppTopAppBar
 import com.example.cafebrown.ui.components.MainBox
 import com.example.cafebrown.ui.components.MainColumn
@@ -68,27 +70,28 @@ fun ReserveScreen(
 
     ) {
     val context = LocalContext.current
-    var reserveState = reserveViewModel.reserveState.value
+    val reserveState = reserveViewModel.reserveState.value
     val errorSnackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
         reserveViewModel.uiEventFlow.collect() { event ->
             when (event) {
                 is AppUIEvent.ShowMessage -> {
-                    val result = errorSnackBarHostState
-                        .showSnackbar(
-                            message = event.message.asString(context),
-                            actionLabel = UIText.StringResource(R.string.try_again)
-                                .asString(context),
-                            duration = SnackbarDuration.Indefinite
-                        )
-                    when (result) {
-                        SnackbarResult.ActionPerformed -> {
-                            reserveViewModel.onEvent(ReserveEvent.GetReserveTimes(reserveState.tableId))
-                        }
-
-                        else -> {}
-                    }
+                    errorSnackBarHostState.showSnackbar(message = event.message.asString(context))
+//                    val result = errorSnackBarHostState
+//                        .showSnackbar(
+//                            message = event.message.asString(context),
+//                            actionLabel = UIText.StringResource(R.string.try_again)
+//                                .asString(context),
+//                            duration = SnackbarDuration.Indefinite
+//                        )
+//                    when (result) {
+//                        SnackbarResult.ActionPerformed -> {
+//                            reserveViewModel.onEvent(ReserveEvent.GetReserveTimes(reserveState.tableId))
+//                        }
+//
+//                        else -> {}
+//                    }
                 }
 
                 is AppUIEvent.ExpiredToken -> TODO()
@@ -102,12 +105,17 @@ fun ReserveScreen(
     }
 
     if (reserveState.isLoading) {
-        ProgressBarDialog ()
+        ProgressBarDialog()
     }
 
     Scaffold(
         topBar = {
             AppTopAppBar(title = stringResource(id = R.string.reserve), true, onNavUp)
+        },
+        snackbarHost = {
+            SnackbarHost(errorSnackBarHostState) {
+                AppSnackBar(it)
+            }
         },
         content = { paddingValues ->
             MainBox(
@@ -144,28 +152,48 @@ fun ReserveScreen(
                     if (reserveState.isReserveTimeChecked) {
                         TextTitleSmallPrimary(text = stringResource(id = R.string.selected_date_is_ready_for_reserve))
                     } else {
-                        TextTitleSmallError(text = stringResource(id = R.string.selected_date_is_not_valid                                                                                                                                                                         ))
+                        TextTitleSmallError(text = stringResource(id = R.string.selected_date_is_not_valid))
                     }
                 }
 
-                if (reserveState.isEdit){
-                    PrimaryButton(text = stringResource(id = R.string.edit), onClick = {}, modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                        .padding(16.dp))
-                }else{
-                    if (reserveState.isReserveTimeChecked){
-                        PrimaryButton(text = stringResource(id = R.string.edit), onClick = {}, modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .fillMaxWidth()
-                            .padding(16.dp))
-                    }else{
-                        SecondaryButton(text = stringResource(id = R.string.check_table_status), onClick = {}, modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .fillMaxWidth()
-                            .padding(16.dp))
-                    }
-                }
+                PrimaryButton(modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                    text = reserveState.actionLabel.asString(context),
+                    onClick = {
+                        reserveViewModel.onEvent(
+                            ReserveEvent.ActionClick
+                        )
+                    })
+//                if (reserveState.isEdit) {
+//                    PrimaryButton(
+//                        text = stringResource(id = R.string.edit), onClick = {}, modifier = Modifier
+//                            .align(Alignment.BottomCenter)
+//                            .fillMaxWidth()
+//                            .padding(16.dp)
+//                    )
+//                } else {
+//                    if (reserveState.isReserveTimeChecked) {
+//                        PrimaryButton(
+//                            text = stringResource(id = R.string.reserve),
+//                            onClick = {},
+//                            modifier = Modifier
+//                                .align(Alignment.BottomCenter)
+//                                .fillMaxWidth()
+//                                .padding(16.dp)
+//                        )
+//                    } else {
+//                        SecondaryButton(
+//                            text = stringResource(id = R.string.check_table_status),
+//                            onClick = { reserveViewModel.onEvent(ReserveEvent.PostReserveCheck) },
+//                            modifier = Modifier
+//                                .align(Alignment.BottomCenter)
+//                                .fillMaxWidth()
+//                                .padding(16.dp)
+//                        )
+//                    }
+//                }
             }
         }
     )

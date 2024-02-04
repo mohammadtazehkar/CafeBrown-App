@@ -8,4 +8,6 @@ sealed class ReserveEvent {
     data class UpdateSelectedMonth(var newSelectedMonth : String) : ReserveEvent()
     data class UpdateSelectedDay(var newSelectedDay : String) : ReserveEvent()
     data class GetReserveTimes(var tableId: Int): ReserveEvent()
+    data object PostReserveCheck: ReserveEvent()
+    data object ActionClick: ReserveEvent()
 }

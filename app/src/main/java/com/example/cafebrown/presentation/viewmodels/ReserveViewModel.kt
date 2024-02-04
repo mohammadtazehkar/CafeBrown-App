@@ -7,7 +7,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cafebrown.R
+import com.example.cafebrown.data.models.reserve.APIReserveCheckRequest
 import com.example.cafebrown.domain.usecase.GetReserveBaseInfoUseCase
+import com.example.cafebrown.domain.usecase.PostReserveCheckUseCase
 import com.example.cafebrown.presentation.events.AppUIEvent
 import com.example.cafebrown.presentation.events.ReserveEvent
 import com.example.cafebrown.presentation.states.ReserveState
@@ -24,7 +26,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ReserveViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val getReserveBaseInfoUseCase: GetReserveBaseInfoUseCase
+    private val getReserveBaseInfoUseCase: GetReserveBaseInfoUseCase,
+    private val postReserveCheckUseCase: PostReserveCheckUseCase
 ) : ViewModel() {
 
     private val _uiEventFlow = MutableSharedFlow<AppUIEvent>()
@@ -42,7 +45,9 @@ class ReserveViewModel @Inject constructor(
             monthList = (1..12).map { it.toString() },
             daysList = (1..31).map { it.toString() },
             hoursList = (0..24).map { it.toString() },
-            minuteList = listOf("00", "15", "30", "45")
+            minuteList = listOf("00", "15", "30", "45"),
+            reserveCheckRequest = Resource.Error(""),
+            actionLabel = UIText.StringResource(R.string.check_table_status)
         )
     )
 
@@ -54,31 +59,48 @@ class ReserveViewModel @Inject constructor(
                 _reverseState.value = reserveState.value.copy(
                     selectedPeriod = event.newSelectedPeriod
                 )
-                var cost = _reverseState.value.response.data?.data?.reserveTimeData?.indexOfFirst { it.title == _reverseState.value.selectedPeriod }
+                var cost =
+                    _reverseState.value.response.data?.data?.reserveTimeData?.indexOfFirst { it.title == _reverseState.value.selectedPeriod }
 
             }
+
             is ReserveEvent.UpdateSelectedHour -> _reverseState.value = reserveState.value.copy(
-                selectedPeriod = event.newSelectedHour
+                selectedHours = event.newSelectedHour,
+                isSelectedTimeChange = true
             )
 
             is ReserveEvent.UpdateSelectedMinute -> _reverseState.value = reserveState.value.copy(
-                selectedPeriod = event.newSelectedMinute
+                selectedMinute = event.newSelectedMinute,
+                isSelectedTimeChange = true
             )
 
             is ReserveEvent.UpdateSelectedDay -> _reverseState.value =
-                reserveState.value.copy(selectedDay = event.newSelectedDay)
+                reserveState.value.copy(
+                    selectedDay = event.newSelectedDay,
+                    isSelectedTimeChange = true
+                )
 
             is ReserveEvent.UpdateSelectedMonth -> {
-                _reverseState.value = reserveState.value.copy(selectedDay = event.newSelectedMonth)
+                _reverseState.value = reserveState.value.copy(
+                    selectedMonth = event.newSelectedMonth,
+                    isSelectedTimeChange = true
+                )
                 changeMonthsDays(event.newSelectedMonth.toInt())
             }
 
             is ReserveEvent.UpdateSelectedYear -> {
-                _reverseState.value = reserveState.value.copy(selectedDay = event.newSelectedYear)
+                _reverseState.value = reserveState.value.copy(
+                    selectedYear = event.newSelectedYear,
+                    isSelectedTimeChange = true
+                )
                 checkLeapYear(event.newSelectedYear.toInt())
             }
 
             is ReserveEvent.GetReserveTimes -> getReserveTimes()
+
+            is ReserveEvent.PostReserveCheck -> postReserveCheck()
+
+            is ReserveEvent.ActionClick -> postReserveCheck()
         }
     }
 
@@ -118,7 +140,7 @@ class ReserveViewModel @Inject constructor(
     private fun getReserveTimes() {
         _reverseState.value = reserveState.value.copy(
             response = Resource.Loading(),
-            isLoading = false
+            isLoading = true
         )
 
         viewModelScope.launch {
@@ -144,6 +166,9 @@ class ReserveViewModel @Inject constructor(
                 }
 
                 JSonStatusCode.INTERNET_CONNECTION -> {
+                    _reverseState.value = reserveState.value.copy(
+                        response = Resource.Error(_reverseState.value.response.data?.message.toString())
+                    )
                     Log.i("meyti", "emit")
                     _uiEventFlow.emit(
                         AppUIEvent.ShowMessage(
@@ -153,6 +178,9 @@ class ReserveViewModel @Inject constructor(
                 }
 
                 JSonStatusCode.SERVER_CONNECTION -> {
+                    _reverseState.value = reserveState.value.copy(
+                        response = Resource.Error(_reverseState.value.response.data?.message.toString())
+                    )
                     _uiEventFlow.emit(
                         AppUIEvent.ShowMessage(
                             message = UIText.StringResource(R.string.connection_problem)
@@ -167,4 +195,74 @@ class ReserveViewModel @Inject constructor(
         }
     }
 
+    private fun postReserveCheck() {
+        _reverseState.value = reserveState.value.copy(
+            reserveCheckRequest = Resource.Loading(),
+            isLoading = true
+        )
+
+        viewModelScope.launch {
+            val apiReserveCheckRequest = APIReserveCheckRequest(
+                tableId = _reverseState.value.tableId,
+                reserveTimeId = _reverseState.value.response.data?.data?.reserveTimeData!!.first { it.title == _reverseState.value.selectedPeriod }.id,
+                date = _reverseState.value.selectedYear + "/" + _reverseState.value.selectedMonth + "/" + _reverseState.value.selectedDay,
+                time = _reverseState.value.selectedHours + ":" + _reverseState.value.selectedMinute
+            )
+            _reverseState.value = reserveState.value.copy(
+                reserveCheckRequest = postReserveCheckUseCase.execute(
+                    apiReserveCheckRequest
+                )
+            )
+
+
+            Log.i("Meyti", apiReserveCheckRequest.toString())
+
+
+            when (_reverseState.value.reserveCheckRequest.data?.status) {
+                JSonStatusCode.BAD_REQUEST -> {
+                    _uiEventFlow.emit(
+                        AppUIEvent.ShowMessage(
+                            message = UIText.DynamicString(_reverseState.value.reserveCheckRequest.data?.message!!)
+                        )
+                    )
+                }
+
+                JSonStatusCode.SUCCESS -> {
+
+                    _reverseState.value = reserveState.value.copy(
+                        reserveCheckRequest = _reverseState.value.reserveCheckRequest
+                    )
+                    val result =
+                        _reverseState.value.reserveCheckRequest.data?.status.toString() + " " + _reverseState.value.reserveCheckRequest.data?.message;
+                    Log.i("meyti", result)
+                }
+
+                JSonStatusCode.INTERNET_CONNECTION -> {
+                    Log.i("meyti", "emit")
+                    _uiEventFlow.emit(
+                        AppUIEvent.ShowMessage(
+                            message = UIText.StringResource(R.string.internet_connection_problem)
+                        )
+                    )
+                }
+
+                JSonStatusCode.SERVER_CONNECTION -> {
+                    Log.i("meyti", _reverseState.value.reserveCheckRequest.data?.status.toString())
+                    _uiEventFlow.emit(
+                        AppUIEvent.ShowMessage(
+                            message = UIText.StringResource(R.string.connection_problem)
+                        )
+                    )
+                }
+
+            }
+
+            Log.i("meyti", "Before isLoading = false")
+            _reverseState.value = reserveState.value.copy(
+                Log.i("meyti", "isLoading = false"),
+                isLoading = false
+            )
+
+        }
+    }
 }

@@ -18,6 +18,7 @@ import com.example.cafebrown.data.models.transaction.APIGetUserTransactionsRespo
 import com.example.cafebrown.data.models.reserve.APIGetReserveBaseInfoResponse
 import com.example.cafebrown.data.models.reserveHistory.APIGetUserReserveResponse
 import com.example.cafebrown.data.models.transaction.APIPostIncreaseBalanceRequest
+import com.example.cafebrown.data.models.reserve.APIReserveCheckRequest
 import com.example.cafebrown.data.models.verify.APIPostVerificationCodeRequest
 import com.example.cafebrown.data.models.verify.APIPostVerificationCodeResponse
 import com.example.cafebrown.utils.ServerConstants.AUTHORIZATION
@@ -32,6 +33,7 @@ import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_MENU
 import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_RESERVE_TIMES
 import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_SUB_MENU_AND_PRODUCT
 import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_TABLES
+import com.example.cafebrown.utils.ServerConstants.SUB_URL_POST_RESERVE_CHECK
 import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_USER_RESERVES
 import com.example.cafebrown.utils.ServerConstants.SUB_URL_POST_COMMENT
 import com.example.cafebrown.utils.ServerConstants.SUB_URL_GET_TRANSACTIONS
@@ -104,6 +106,11 @@ interface APIService {
         @Body apiPostComplaintsRequest: APIPostComplaintsRequest
     ): Response<APIGlobalResponse>
     suspend fun getReserveTimes(@Header(AUTHORIZATION) token: String, @Query(TABLE_ID) tableId: Int): Response<APIGetReserveBaseInfoResponse>
+
+    @POST(SUB_URL_POST_RESERVE_CHECK)
+    suspend fun postReserveCheck(@Header(AUTHORIZATION) token: String, @Body apiReserveCheckRequest: APIReserveCheckRequest): Response<APIGlobalResponse>
+
+
 
     @GET(SUB_URL_GET_PRODUCT_DETAIL)
     suspend fun getProductDetail(
