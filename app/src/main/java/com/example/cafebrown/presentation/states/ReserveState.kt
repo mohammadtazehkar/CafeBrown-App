@@ -1,9 +1,12 @@
 package com.example.cafebrown.presentation.states
 
+import com.example.cafebrown.data.models.APIGlobalResponse
 import com.example.cafebrown.data.models.desk.APIGetDeskResponse
 import com.example.cafebrown.data.models.reserve.APIGetReserveBaseInfoResponse
+import com.example.cafebrown.data.models.reserve.APIReserveCheckRequest
 import com.example.cafebrown.data.models.reserve.GetReserveTimeResponse
 import com.example.cafebrown.utils.Resource
+import com.example.cafebrown.utils.UIText
 
 data class ReserveState  (
     var tableId:Int,
@@ -28,5 +31,8 @@ data class ReserveState  (
     var isLeap: Boolean = false,
     var isEdit : Boolean = false,
     var from : String = "",
-    var isReserveTimeChecked: Boolean = false
+    var isReserveTimeChecked: Boolean = false,
+    var reserveCheckRequest: Resource<APIGlobalResponse>,
+    var isSelectedTimeChange: Boolean = true,
+    var actionLabel: UIText
 )

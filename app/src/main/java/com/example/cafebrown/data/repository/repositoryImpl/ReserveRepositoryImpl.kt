@@ -1,7 +1,10 @@
 package com.example.cafebrown.data.repository.repositoryImpl
 
+import android.util.Log
+import com.example.cafebrown.data.models.APIGlobalResponse
 import com.example.cafebrown.data.models.desk.APIGetDeskResponse
 import com.example.cafebrown.data.models.reserve.APIGetReserveBaseInfoResponse
+import com.example.cafebrown.data.models.reserve.APIReserveCheckRequest
 import com.example.cafebrown.data.repository.datasource.AppLocalDataSource
 import com.example.cafebrown.data.repository.datasource.ReserveRemoteDataSource
 import com.example.cafebrown.domain.repository.ReserveRepository
@@ -52,6 +55,50 @@ class ReserveRepositoryImpl(
                 APIGetReserveBaseInfoResponse(
                     JSonStatusCode.INTERNET_CONNECTION,
                     null,
+                    "No internet connection"
+                )
+            )
+        }
+    }
+
+    override suspend fun postReserveCheck(apiReserveCheckRequest: APIReserveCheckRequest): Resource<APIGlobalResponse> {
+        return if (networkUtil.isInternetAvailable()) {
+            try {
+                val token = appLocalDataSource.getTokenFromDB()
+                Log.i("Meyti", "token  " + token)
+                val response =
+                    reserveRemoteDataSource.postReserveCheck(
+                        "${ServerConstants.TOKEN_TYPE} $token",
+                        apiReserveCheckRequest
+                    )
+                if (response.isSuccessful && response.body() != null) {
+                    Resource.Success(response.body()!!)
+                } else {
+                    Resource.Error(
+                        "An error occurred",
+                        APIGlobalResponse(
+                            JSonStatusCode.SERVER_CONNECTION,
+                            "",
+                            "An error occurred"
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                Resource.Error(
+                    "No internet connection",
+                    APIGlobalResponse(
+                        JSonStatusCode.SERVER_CONNECTION,
+                        "",
+                        "No internet connection"
+                    )
+                )
+            }
+        } else {
+            Resource.Error(
+                "No internet connection",
+                APIGlobalResponse(
+                    JSonStatusCode.INTERNET_CONNECTION,
+                    "",
                     "No internet connection"
                 )
             )

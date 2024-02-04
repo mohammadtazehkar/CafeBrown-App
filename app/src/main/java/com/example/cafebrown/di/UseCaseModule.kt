@@ -19,6 +19,7 @@ import com.example.cafebrown.domain.usecase.GetSubMenuAndProductListUseCase
 import com.example.cafebrown.domain.usecase.GetReserveBaseInfoUseCase
 import com.example.cafebrown.domain.usecase.GetTransactionListUseCase
 import com.example.cafebrown.domain.usecase.PostMobileUseCase
+import com.example.cafebrown.domain.usecase.PostReserveCheckUseCase
 import com.example.cafebrown.domain.usecase.PostVerificationCodeUseCase
 import com.example.cafebrown.domain.usecase.UpdateProfileDataUseCase
 import dagger.Module
@@ -116,6 +117,14 @@ class UseCaseModule {
         transactionRepository: TransactionRepository
     ): GetTransactionListUseCase {
         return GetTransactionListUseCase(transactionRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun providePostReserveCheckUseCaseUseCase(
+        reserveRepository: ReserveRepository
+    ): PostReserveCheckUseCase {
+        return PostReserveCheckUseCase(reserveRepository)
     }
 
 }
