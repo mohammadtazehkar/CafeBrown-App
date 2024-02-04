@@ -29,6 +29,8 @@ import com.example.cafebrown.ui.components.PrimaryButton
 import com.example.cafebrown.ui.components.TextLabelSmall
 import com.example.cafebrown.ui.components.TextTitleMedium
 import com.example.cafebrown.ui.theme.AppTheme
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun IncreaseBalanceDialog(
@@ -58,7 +60,9 @@ fun IncreaseBalanceDialog(
             )
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 TextTitleMedium(
-                    text = " ${stringResource(id = R.string.your_wallet_balance_is)} ${balance} ${
+                    text = " ${stringResource(id = R.string.your_wallet_balance_is)} ${
+                        NumberFormat.getNumberInstance(
+                            Locale.US).format(balance.toLong())} ${
                         stringResource(
                             id = R.string.toman
                         )

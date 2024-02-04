@@ -5,7 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cafebrown.R
+import com.example.cafebrown.data.models.transaction.APIPostIncreaseBalanceRequest
 import com.example.cafebrown.domain.usecase.GetTransactionListUseCase
+import com.example.cafebrown.domain.usecase.PostIncreaseBalanceUseCase
 import com.example.cafebrown.presentation.events.AppUIEvent
 import com.example.cafebrown.presentation.events.TransactionEvent
 import com.example.cafebrown.presentation.states.TransactionState
@@ -22,10 +24,13 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
-class TransactionViewModel @Inject constructor(val getTransactionListUseCase: GetTransactionListUseCase) :
-    ViewModel() {
+class TransactionViewModel @Inject constructor(
+    val getTransactionListUseCase: GetTransactionListUseCase,
+    val postIncreaseBalanceUseCase: PostIncreaseBalanceUseCase
+) : ViewModel() {
 
 
     private val _transactionState = mutableStateOf(TransactionState())
@@ -33,7 +38,7 @@ class TransactionViewModel @Inject constructor(val getTransactionListUseCase: Ge
     private val _screenSharedFlow = MutableSharedFlow<AppUIEvent>()
     val screenSharedFlow: SharedFlow<AppUIEvent> = _screenSharedFlow.asSharedFlow()
 
-    fun getTransactionList() {
+    private fun getTransactionList() {
         _transactionState.value =
             transactionState.value.copy(isLoading = true, response = Resource.Loading())
         viewModelScope.launch {
@@ -66,11 +71,67 @@ class TransactionViewModel @Inject constructor(val getTransactionListUseCase: Ge
                 }
 
                 EXPIRED_TOKEN -> {
-                    //TODO
+                    _screenSharedFlow.emit(AppUIEvent.ExpiredToken)
                 }
             }
             _transactionState.value = transactionState.value.copy(isLoading = false)
         }
+    }
+
+    private fun postIncreaseBalance() {
+        _transactionState.value =
+            transactionState.value.copy(isIncreaseBalanceRequest = true,isLoading = true, responsePost = Resource.Loading())
+        viewModelScope.launch {
+            _transactionState.value = transactionState.value.copy(
+                responsePost = postIncreaseBalanceUseCase.execute(
+                    APIPostIncreaseBalanceRequest(
+                        status = "true",
+                        refId = Random.nextInt(1, 1000).toString(),
+                        amount = _transactionState.value.increaseBalance.toLong()
+                    )
+                )
+            )
+            when (_transactionState.value.responsePost.data?.status) {
+                BAD_REQUEST -> {
+                    _screenSharedFlow.emit(
+                        AppUIEvent.ShowMessage(
+                            UIText.DynamicString(
+                                _transactionState.value.responsePost.data?.message!!
+                            )
+                        )
+                    )
+                }
+
+                SUCCESS -> {
+                    _screenSharedFlow.emit(
+                        AppUIEvent.ShowMessage(
+                            UIText.StringResource(R.string.increase_balance_successfully),
+                            isError = false
+                        )
+                    )
+                    _transactionState.value = transactionState.value.copy(isIncreaseBalanceRequest = false,increaseBalance = "")
+//                    val finalBalance =
+//                        _transactionState.value.balance?.plus(_transactionState.value.increaseBalance.toLong())
+//                    _transactionState.value =
+//                        transactionState.value.copy(balance = finalBalance)
+                    getTransactionList()
+                }
+
+                INTERNET_CONNECTION -> {
+                    _screenSharedFlow.emit(AppUIEvent.ShowMessage(UIText.StringResource(R.string.internet_connection_problem)))
+                }
+
+                SERVER_CONNECTION -> {
+                    _screenSharedFlow.emit(AppUIEvent.ShowMessage(UIText.StringResource(R.string.connection_problem)))
+                }
+
+                EXPIRED_TOKEN -> {
+                    _screenSharedFlow.emit(AppUIEvent.ExpiredToken)
+                }
+            }
+            _transactionState.value = transactionState.value.copy(isLoading = false)
+        }
+
     }
 
     fun onEvent(event: TransactionEvent) {
@@ -87,9 +148,8 @@ class TransactionViewModel @Inject constructor(val getTransactionListUseCase: Ge
                 )
             }
 
-            is TransactionEvent.GetTransactionListFromServer -> {
-                getTransactionList()
-            }
+            is TransactionEvent.GetTransactionListFromServer -> getTransactionList()
+            is TransactionEvent.PostIncreaseBalanceToServer -> postIncreaseBalance()
         }
     }
 }

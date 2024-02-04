@@ -5,5 +5,6 @@ sealed class AboutUsEvent {
     data class ChangeComplaintDialogVisibility(val status: Boolean) : AboutUsEvent()
     data class ChangeComplaintData(val text: String) : AboutUsEvent()
     data class ChangeRulesDialogVisibility(val status: Boolean) : AboutUsEvent()
-
+    data object GetCoffeeShopDataFromServer : AboutUsEvent()
+    data object PostComplaintsToServer : AboutUsEvent()
 }

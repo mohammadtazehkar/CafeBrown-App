@@ -1,6 +1,7 @@
 package com.example.cafebrown.di
 
 import com.example.cafebrown.data.api.APIService
+import com.example.cafebrown.data.repository.datasource.AboutUsRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.DeskRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.HomeRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.LoginRemoteDataSource
@@ -12,6 +13,7 @@ import com.example.cafebrown.data.repository.datasource.ReserveHistoryRemoteData
 import com.example.cafebrown.data.repository.datasource.ReserveRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.TransactionRemoteDataSource
 import com.example.cafebrown.data.repository.datasource.VerifyRemoteDataSource
+import com.example.cafebrown.data.repository.datasourceImpl.AboutUsRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.DeskRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.HomeDataRemoteDataSourceImpl
 import com.example.cafebrown.data.repository.datasourceImpl.LoginRemoteDataSourceImpl
@@ -72,6 +74,7 @@ class RemoteDataModule {
     ): DeskRemoteDataSource {
         return DeskRemoteDataSourceImpl(apiService)
     }
+
     @Singleton
     @Provides
     fun provideReserveRemoteDataSource(
@@ -100,6 +103,12 @@ class RemoteDataModule {
     @Provides
     fun provideTransactionRemoteDataSource(apiService: APIService): TransactionRemoteDataSource {
         return TransactionRemoteDataSourceImpl(apiService)
+    }
+
+    @Singleton
+    @Provides
+    fun provideAboutUsRemoteDataSource(apiService: APIService): AboutUsRemoteDataSource {
+        return AboutUsRemoteDataSourceImpl(apiService)
     }
 
     @Singleton

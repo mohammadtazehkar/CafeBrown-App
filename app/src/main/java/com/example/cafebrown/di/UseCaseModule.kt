@@ -1,5 +1,6 @@
 package com.example.cafebrown.di
 
+import com.example.cafebrown.domain.repository.AboutUsRepository
 import com.example.cafebrown.domain.repository.CheckUserDataRepository
 import com.example.cafebrown.domain.repository.DeskRepository
 import com.example.cafebrown.domain.repository.HomeRepository
@@ -14,6 +15,7 @@ import com.example.cafebrown.domain.repository.TransactionRepository
 import com.example.cafebrown.domain.repository.VerifyRepository
 import com.example.cafebrown.domain.usecase.CheckUserDataUseCase
 import com.example.cafebrown.domain.usecase.GetCommentListUseCase
+import com.example.cafebrown.domain.usecase.GetCoffeeShopDataUseCase
 import com.example.cafebrown.domain.usecase.GetMenuListUseCase
 import com.example.cafebrown.domain.usecase.GetDeskListDataUseCase
 import com.example.cafebrown.domain.usecase.GetHomeDataUseCase
@@ -24,6 +26,8 @@ import com.example.cafebrown.domain.usecase.GetReserveBaseInfoUseCase
 import com.example.cafebrown.domain.usecase.GetReserveHistoryListUseCase
 import com.example.cafebrown.domain.usecase.GetTransactionListUseCase
 import com.example.cafebrown.domain.usecase.PostCommentUseCase
+import com.example.cafebrown.domain.usecase.PostComplaintsUseCase
+import com.example.cafebrown.domain.usecase.PostIncreaseBalanceUseCase
 import com.example.cafebrown.domain.usecase.PostMobileUseCase
 import com.example.cafebrown.domain.usecase.PostVerificationCodeUseCase
 import com.example.cafebrown.domain.usecase.UpdateProfileDataUseCase
@@ -100,11 +104,12 @@ class UseCaseModule {
     ): GetReserveBaseInfoUseCase {
         return GetReserveBaseInfoUseCase(reserveRepository)
     }
+
     @Singleton
     @Provides
     fun provideGetMenuListUseCase(
         menuRepository: MenuRepository
-    ):GetMenuListUseCase{
+    ): GetMenuListUseCase {
         return GetMenuListUseCase(menuRepository)
     }
 
@@ -112,7 +117,7 @@ class UseCaseModule {
     @Provides
     fun provideGetSubMenuAndProductListUseCase(
         productRepository: ProductRepository
-    ):GetSubMenuAndProductListUseCase{
+    ): GetSubMenuAndProductListUseCase {
         return GetSubMenuAndProductListUseCase(productRepository)
     }
 
@@ -122,6 +127,30 @@ class UseCaseModule {
         transactionRepository: TransactionRepository
     ): GetTransactionListUseCase {
         return GetTransactionListUseCase(transactionRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun providePostIncreaseBalanceUseCase(
+        transactionRepository: TransactionRepository
+    ): PostIncreaseBalanceUseCase {
+        return PostIncreaseBalanceUseCase(transactionRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideGetCoffeeShopDataUseCase(
+        aboutUsRepository: AboutUsRepository
+    ): GetCoffeeShopDataUseCase {
+        return GetCoffeeShopDataUseCase(aboutUsRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun providePostComplaintsUseCase(
+        aboutUsRepository: AboutUsRepository
+    ): PostComplaintsUseCase {
+        return PostComplaintsUseCase(aboutUsRepository)
     }
 
     @Singleton
